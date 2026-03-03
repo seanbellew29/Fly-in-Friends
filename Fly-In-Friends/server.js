@@ -1,7 +1,17 @@
+//necessary server items
 const express = require("express"),
 app = express();
-
 app.set("view engine", "ejs");
+
+
+/*
+* environmental variables setup
+* availavle variables: 
+* to import a variable, use : process.env.{VARIABLENAME};
+*/
+//const {loadEnvFile} = require("node:process");
+//loadEnvFile("secretData.env");
+
 
 //routing blocks
 app.get("/", function (req, res) {
