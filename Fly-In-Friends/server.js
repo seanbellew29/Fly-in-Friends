@@ -15,7 +15,11 @@ app.set("view engine", "ejs");
 
 //routing blocks
 app.get("/", function (req, res) {
-    res.render("index");
+    res.render("landing");
+});
+
+app.get("/landing", function (req, res) {
+    res.render("landing");
 });
 
 app.get("/login", function (req, res) {
@@ -26,9 +30,31 @@ app.get("/chat-page", function (req, res) {
     res.render("chat-page");
 });
 
-app.get("/test", function (req, res) {
-    res.render("test");
+app.get("/map", function (req, res) {
+    res.render("map");
 });
+
+app.get("/profile-page", function (req, res) {
+    console.log("pass");
+    res.render("profile-page");
+});
+
+app.get("/listings", function (req, res) {
+    res.render("listings");
+});
+
+app.get("/message", function (req, res) {
+    res.render("chat-page");
+});
+
+
+//TEMPORARY Post functionality, replace this later with checking account details from Database
+app.post("/login", function(req,res){
+    res.render("profile-page");
+});
+
+
+
 
 //start server. should be the last function/code in the whole script
 app.listen(3000, function () {
