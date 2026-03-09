@@ -1,0 +1,158 @@
+/* 
+   PAGE BACKGROUND
+ */
+
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#0A447E; /* the exact same colour as the image gives cool affect */
+}
+
+/* 
+   main card
+   Holds login card and image
+*/
+
+.container{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:1100px;
+    max-width:90%;
+    margin:60px auto;
+}
+
+/* 
+   LOGIN CARD
+ */
+
+.login-card{
+    background:#f3f3f3;
+    padding:50px;
+    border-radius:12px;
+
+    width:450px; 
+}
+
+/*
+   ICON
+*/
+
+.icon{
+    text-align:center;
+    font-size:30px;
+    margin-bottom:15px;
+}
+
+/* 
+   HEADINGS
+ */
+
+.login-card h2{
+    text-align:center;
+    margin-bottom:5px;
+}
+
+.login-card p{
+    text-align:center;
+    color:#666;
+    margin-bottom:30px;
+}
+
+/* 
+   INPUT FIELDS
+*/
+
+.input-group{
+    margin-bottom:25px;
+}
+
+.input-group label{
+    display:block;
+    font-weight:bold;
+}
+
+.input-group input{
+    width:100%;
+    border:none;
+    border-bottom:2px solid #888;
+    padding:8px 0;
+    outline:none;
+}
+
+/*
+   PASSWORD FIELD WITH EYE ICON
+*/
+
+.password-wrapper{
+    display:flex;
+    align-items:center;
+}
+
+.password-wrapper input{
+    flex:1;
+}
+
+.password-wrapper span{
+    margin-left:10px;
+    cursor:pointer;
+}
+
+/*OPTIONS SECTION*/
+
+.options{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:20px 0;
+}
+
+.options a{
+    font-size:14px;
+    color:#666;
+}
+
+/*
+   LOGIN BUTTON
+*/
+
+.login-btn{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:25px;
+    background:#f78c40;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    margin-bottom:15px;
+}
+
+
+/*-
+   IMAGE SIDE
+*/
+
+.image-side img{
+    width:520px;
+}
+
+/*
+   MOBILE
+*/
+
+@media(max-width:900px){
+
+.container{
+    flex-direction:column;
+}
+
+.image-side{
+    margin-top:40px;
+}
+
+.image-side img{
+    width:300px;
+}
+
+}

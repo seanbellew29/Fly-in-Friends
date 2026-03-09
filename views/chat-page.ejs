@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Messaging</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/chat-page.css">
+</head>
+<body>
+
+    <%- include("partials/navbar"); %>
+
+<div class="chat-wrapper">
+
+   
+    <div class="sidebar">
+        <h2>Messages</h2>
+
+        <div class="conversation active">
+            <div class="avatar">ID</div>
+            <div>
+                <p class="name">Seán</p>
+                <p class="preview">Hi, will we go Temple Bar?</p>
+            </div>
+        </div>
+
+        <div class="conversation">
+            <div class="avatar">ID</div>
+            <div>
+                <p class="name">Ryan Loehmann</p>
+                <p class="preview">ye that sounds like...</p>
+            </div>
+        </div>
+
+    </div>
+
+    
+    <div class="chat-section">
+
+        <div class="chat-header">
+           Seán Bellew
+        </div>
+
+        <div class="messages" id="messages">
+
+            <div class="message received">
+                Hi, I have just arrived in Dublin
+            </div>
+
+            <div class="message sent">
+                Lets go to Temple Bar
+            </div>
+
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function sendMessage() {
+    const input = document.getElementById("messageInput");//finds id 
+    const messages = document.getElementById("messages");//comntains the messages
+
+    const newMessage = document.createElement("div");
+    newMessage.classList.add("message", "sent");//for css
+    newMessage.textContent = input.value;//wraps the message 
+
+    messages.appendChild(newMessage);//adds the message to the container
+    messages.scrollTop = messages.scrollHeight;//the height of the message 
+
+    input.value = "";//empty message
+}
+
+//Sends the message when user presses send
+document.getElementById("messageInput")
+    .addEventListener("keypress", function(enter) {
+        if (enter.key === "Enter") { //when the user clicks enter the message is sent 
+            sendMessage();
+        }
+});
+
+
+</script>
+<%- include("partials/footer"); %>
+
+</body>
+</html>
