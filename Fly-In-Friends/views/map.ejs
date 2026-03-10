@@ -2,7 +2,8 @@
 <html>
 <head>
     <title>Fly-in Friends - Home</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/styles/map.css">
+    <link rel="stylesheet" href="/styles/styles.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
@@ -23,23 +24,24 @@
         <div id="listings-container">
             <h2>Available Hangouts</h2>
             <div class="listing">
-                <h3>Temple Bar Meetup</h3>
+                <h3>📍Temple Bar Meetup</h3>
                 <p>Location: Temple Bar</p>
                 <p>Activity: Drinks and music with locals.</p>
             </div>
             <div class="listing">
-                <h3>Dublin Castle Tour</h3>
+                <h3>📍Dublin Castle Tour</h3>
                 <p>Location: Dublin Castle</p>
                 <p>Activity: Explore the historic castle.</p>
             </div>
             <div class="listing">
-                <h3>River Liffey Walk</h3>
+                <h3>📍River Liffey Walk</h3>
                 <p>Location: River Liffey</p>
                 <p>Activity: Casual evening walk.</p>
             </div>
         </div>
     </div>
 
-    <script src="/script.js"></script>
+    <%- include("partials/footer"); %>
+<script src="/script.js"></script>
 </body>
 </html>
