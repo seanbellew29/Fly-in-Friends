@@ -11,7 +11,7 @@ app.use(express.static('public'));
 * to import a variable, use : process.env.{VARIABLENAME};
 */
 const {loadEnvFile} = require("node:process");
-loadEnvFile("./etc/secrets/secretData.env");
+loadEnvFile("secretData.env");
 s = process.env.superVariable;
 test = process.env.test;
 
