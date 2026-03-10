@@ -10,8 +10,10 @@ app.use(express.static('public'));
 * availavle variables: 
 * to import a variable, use : process.env.{VARIABLENAME};
 */
-//const {loadEnvFile} = require("node:process");
-//loadEnvFile("secretData.env");
+const {loadEnvFile} = require("node:process");
+loadEnvFile("./etc/secrets/secretData.env");
+s = process.env.superVariable;
+test = process.env.test;
 
 
 //routing blocks
@@ -54,10 +56,8 @@ app.post("/login", function(req,res){
     res.render("profile-page");
 });
 
-
-
-
 //start server. should be the last function/code in the whole script
 app.listen(3000, function () {
     console.log("Server is running on port 3000");
+    console.log(test);
 });
