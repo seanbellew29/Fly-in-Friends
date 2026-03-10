@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Profile</title>
-    <link rel="stylesheet" href="../public/styles/profile.css">
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/profile-page.css">
 </head>
 <body>
 
@@ -11,18 +12,19 @@
 
 <div class="profile-wrapper">
 
-    <!-- Left Sidebar -->
-    <div class="profile-sidebar">
-        <div class="profile-card">
-            <div class="profile-avatar">SB</div>
-            <h2>Seán Bellew</h2>
-            <p class="username">@SeanB29</p>
-            <p class="age">21</p>
-            <button onclick="toggleEdit()">Edit Profile</button>
-        </div>
+   <!-- Left Sidebar -->
+<div class="profile-sidebar">
+    <div class="profile-card">
+        <div class="profile-avatar">SB</div>
+        <h2>Seán Bellew</h2>
+        <p class="username">@SeanB29</p>
+        <p class="age">21</p>
+        <button onclick="toggleEdit()">Edit Profile</button>
+    </div>
+</div>
 
-    <!-- Main Content -->
-    <div class="profile-content">
+<!-- Main Content -->
+<div class="profile-content">
 
         <div class="about-section">
             <h2>Interests</h2>
@@ -60,6 +62,8 @@ function toggleEdit() {
     }
 }
 </script>
+
+<%- include("partials/footer"); %>
 
 </body>
 </html>
