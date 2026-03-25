@@ -12,9 +12,7 @@ app.use(express.static('public'));
 */
 const {loadEnvFile} = require("node:process");
 loadEnvFile("secretData.env");
-/*
-* 
-*/
+//load functions below
 const login = require("./loginScript.js");
 
 
