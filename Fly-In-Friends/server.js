@@ -7,13 +7,15 @@ app.use(express.static('public'));
 
 /*
 * environmental variables setup
-* availavle variables: 
-* to import a variable, use : process.env.{VARIABLENAME};
+* available variables: 
+* to import a variable, use : x = process.env.{VARIABLENAME};
 */
 const {loadEnvFile} = require("node:process");
 loadEnvFile("secretData.env");
-s = process.env.superVariable;
-test = process.env.test;
+/*
+* 
+*/
+const login = require("./loginScript.js");
 
 
 //routing blocks
@@ -50,8 +52,7 @@ app.get("/message", function (req, res) {
     res.render("chat-page");
 });
 
-
-//TEMPORARY Post functionality, replace this later with checking account details from Database
+//POST functions
 app.post("/login", function(req,res){
     res.render("profile-page");
 });
@@ -59,5 +60,4 @@ app.post("/login", function(req,res){
 //start server. should be the last function/code in the whole script
 app.listen(3000, function () {
     console.log("Server is running on port 3000");
-    console.log(test);
 });
