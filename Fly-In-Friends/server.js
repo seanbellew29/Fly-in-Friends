@@ -1,27 +1,31 @@
-//necessary server items
-const express = require("express"),
-app = express();
-app.set("view engine", "ejs");
-app.use(express.static('public'));
+const express = require('express');
+const mongoose = require('mongoose');
+
+const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 
-/*
-* environmental variables setup
-* available variables: 
-* to import a variable, use : x = process.env.{VARIABLENAME};
-*/
-const {loadEnvFile} = require("node:process");
-loadEnvFile("secretData.env");
-//load functions below
-const login = require("./loginScript.js");
+// Views engine
+app.set('view engine', 'ejs');
 
+// MongoDB connection
+const dbURI = "mongodb+srv://Sean_DB:Stockholm29@cluster0.kunhm3i.mongodb.net/Fly-in-Friends?retryWrites=true&w=majority";
+
+mongoose.connect(dbURI)
+  .then(() => console.log("Connected to Fly-in-Friends database"))//display when connect
+  .catch(err => console.error("Database connection error:", err));//displays when not connectd
+
+// The db  structure
+const User = mongoose.model('User', {
+  username: String,
+  email: String,  
+  password: String,
+  role: String
+});
 
 //routing blocks
 app.get("/", function (req, res) {
-    res.render("landing");
-});
-
-app.get("/landing", function (req, res) {
     res.render("landing");
 });
 
@@ -50,12 +54,55 @@ app.get("/message", function (req, res) {
     res.render("chat-page");
 });
 
-//POST functions
-app.post("/login", function(req,res){
-    res.render("profile-page");
+//register page
+app.get('/register', (req, res) => {
+  res.render('register'); 
 });
 
-//start server. should be the last function/code in the whole script
-app.listen(3000, function () {
-    console.log("Server is running on port 3000");
+//POST functions
+app.post('/register', async (req, res) => {
+  console.log('req.body:', req.body);
+
+  
+//The users credentials requirements
+  const { name, email, password, confirm_password, role } = req.body;
+
+  if (!name || !email || !password || !confirm_password || !role) {
+    return res.status(400).send('All fields are required!');//will display when the text fields are not filled out 
+  }
+
+  if (password !== confirm_password) {
+    return res.status(400).send('Passwords do not match!');//will display this when the passwrds dont match
+  }
+
+  const newUser = new User({ username: name, email, password, role });
+  await newUser.save();
+
+  res.redirect('/login');//will redirect the user tp the login page when the user submits their info
 });
+
+app.get('/test', (req, res) => res.send('Server is running!'));//testing the server to run 
+
+// Handles login form submission
+app.post('/login', async (req, res) => {
+  try {
+    const { username, password, role } = req.body;
+
+    const user = new User({ username, password, role });
+    await user.save();
+
+    // After login it will redirect to home page
+    res.redirect('/dashboard');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error processing login');
+  }
+});
+
+// Starts the  server
+app.listen(3000, () => {
+  console.log('Server running on http://localhost:3000');
+});
+
+app.use(express.static('public'));
+
