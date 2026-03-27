@@ -1,18 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bcrypt = require("bcrypt");
-
+const Listing = require("./models/Listing");
+const convertLocationToCoords = require("./locationConversion");
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static("public"));
 require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
 
 
 // Views engine
 app.set('view engine', 'ejs');
-const messageRoutes = require('./messages');
-app.use('/', messageRoutes);
 
 
 /*
@@ -62,8 +61,14 @@ app.get("/profile-page", function (req, res) {
     res.render("profile-page");
 });
 
-app.get("/listings", function (req, res) {
-    res.render("listings");
+app.get("/listings", async (req, res) => {
+    try {
+        const listings = await Listing.find();
+        res.render("listings", { listings });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error loading listings page");
+    }
 });
 
 app.get("/message", function (req, res) {
@@ -75,9 +80,48 @@ app.get('/register', (req, res) => {
   res.render('register'); 
 });
 
+
 //POST functions
 app.post('/register', async (req, res) => {
   console.log('req.body:', req.body);
+
+//add listing 
+app.post("/add-listing", async (req, res) => {
+    const { title, location, activity } = req.body;
+
+    if (!title || !location || !activity) {
+        return res.status(400).send("All fields are required");
+    }
+
+    try {
+        const existing = await Listing.findOne({ title, location });
+
+        if (existing) {
+            return res.status(400).send("Listing already exists");
+        }
+
+        const coords = await convertLocationToCoords(location);
+
+        if (!coords) {
+            return res.status(400).send("Location not found");
+        }
+
+        const newListing = new Listing({
+            title,
+            location,
+            activity,
+            latitude: coords.latitude,
+            longitude: coords.longitude
+        });
+
+        await newListing.save();
+
+        res.redirect("/listings");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error saving listing");
+    }
+});
 
   
 //The users credentials requirements
@@ -91,15 +135,9 @@ app.post('/register', async (req, res) => {
     return res.status(400).send('Passwords do not match!');//will display this when the passwrds dont match
   }
 
-  
-  //create account with hashed password
-  bcrypt.hash(password, 10, async (err, hash) => {
-    if (err) throw err;
-    const newUser = new User({ username: name, email, password:hash, role });
-    await newUser.save();
-  });
+  const newUser = new User({ username: name, email, password, role });
+  await newUser.save();
 
-  
   res.redirect('/login');//will redirect the user tp the login page when the user submits their info
 });
 
@@ -109,22 +147,15 @@ app.get('/test', (req, res) => res.send('Server is running!'));//testing the ser
 app.post('/login', async (req, res) => {
   try {
     const { username, password} = req.body;
+
     const foundUser = await User.findOne({username:username});
-
-    bcrypt.compare(password, foundUser.password, function(err, result) {
-        if (err) throw err;
-
-        if (result === true) {
-            //passwords match
-            res.redirect('/map');
-        }else{
-            //passwords do not match
-            res.status(500).send('could not log in');
-        }
-    });
+    if (foundUser.password == password){
+      res.redirect('/map');
+    }else{
+      res.status(500).send('could not log in');
+    }
 
   } catch (err) {
-    //in case of error, redirect
     console.error(err);
     res.status(500).send('could not log in');
   }
@@ -136,3 +167,4 @@ app.listen(3000, () => {
 });
 
 app.use(express.static('public'));
+
