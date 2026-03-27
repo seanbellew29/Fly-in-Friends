@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
 
 
 // Views engine
@@ -33,6 +34,10 @@ const User = mongoose.model('User', {
 
 //routing blocks
 app.get("/", function (req, res) {
+    res.render("landing");
+});
+
+app.get("/landing", function (req, res) {
     res.render("landing");
 });
 
@@ -93,16 +98,18 @@ app.get('/test', (req, res) => res.send('Server is running!'));//testing the ser
 // Handles login form submission
 app.post('/login', async (req, res) => {
   try {
-    const { username, password, role } = req.body;
+    const { username, password} = req.body;
 
-    const user = new User({ username, password, role });
-    await user.save();
+    const foundUser = await User.findOne({username:username});
+    if (foundUser.password == password){
+      res.redirect('/map');
+    }else{
+      res.status(500).send('could not log in');
+    }
 
-    // After login it will redirect to home page
-    res.redirect('/dashboard');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error processing login');
+    res.status(500).send('could not log in');
   }
 });
 
