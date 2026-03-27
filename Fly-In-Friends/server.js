@@ -9,8 +9,15 @@ app.use(express.json());
 // Views engine
 app.set('view engine', 'ejs');
 
-// MongoDB connection
-const dbURI = "mongodb+srv://Sean_DB:Stockholm29@cluster0.kunhm3i.mongodb.net/Fly-in-Friends?retryWrites=true&w=majority";
+
+/*
+* environmental variables setup and MONGODB API KEY
+* available variables: 
+* to import a variable from .env file, use     x = process.env.{VARIABLENAME};
+*/
+const {loadEnvFile} = require("node:process");
+loadEnvFile("secretData.env");
+const dbURI = process.env.APIK;
 
 mongoose.connect(dbURI)
   .then(() => console.log("Connected to Fly-in-Friends database"))//display when connect
