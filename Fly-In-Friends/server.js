@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bcrypt = require("bcrypt");
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -9,8 +10,6 @@ require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
 
 // Views engine
 app.set('view engine', 'ejs');
-
-
 /*
 * environmental variables setup and MONGODB API KEY
 * available variables: 
@@ -87,9 +86,15 @@ app.post('/register', async (req, res) => {
     return res.status(400).send('Passwords do not match!');//will display this when the passwrds dont match
   }
 
-  const newUser = new User({ username: name, email, password, role });
-  await newUser.save();
+  
+  //create account with hashed password
+  bcrypt.hash(password, 10, async (err, hash) => {
+    if (err) throw err;
+    const newUser = new User({ username: name, email, password:hash, role });
+    await newUser.save();
+  });
 
+  
   res.redirect('/login');//will redirect the user tp the login page when the user submits their info
 });
 
@@ -99,15 +104,22 @@ app.get('/test', (req, res) => res.send('Server is running!'));//testing the ser
 app.post('/login', async (req, res) => {
   try {
     const { username, password} = req.body;
-
     const foundUser = await User.findOne({username:username});
-    if (foundUser.password == password){
-      res.redirect('/map');
-    }else{
-      res.status(500).send('could not log in');
-    }
+
+    bcrypt.compare(password, foundUser.password, function(err, result) {
+        if (err) throw err;
+
+        if (result === true) {
+            //passwords match
+            res.redirect('/map');
+        }else{
+            //passwords do not match
+            res.status(500).send('could not log in');
+        }
+    });
 
   } catch (err) {
+    //in case of error, redirect
     console.error(err);
     res.status(500).send('could not log in');
   }
