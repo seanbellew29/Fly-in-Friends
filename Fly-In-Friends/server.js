@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
 
+
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -10,6 +11,10 @@ require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
 
 // Views engine
 app.set('view engine', 'ejs');
+const messageRoutes = require('./messages');
+app.use('/', messageRoutes);
+
+
 /*
 * environmental variables setup and MONGODB API KEY
 * available variables: 
@@ -131,4 +136,3 @@ app.listen(3000, () => {
 });
 
 app.use(express.static('public'));
-

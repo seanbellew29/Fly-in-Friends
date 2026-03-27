@@ -13,14 +13,13 @@
 <div class="profile-wrapper">
 
    <!-- Left Sidebar -->
-<div class="profile-sidebar">
-    <div class="profile-card">
-        <div class="profile-avatar">SB</div>
-        <h2>Seán Bellew</h2>
-        <p class="username">@SeanB29</p>
-        <p class="age">21</p>
-        <button onclick="toggleEdit()">Edit Profile</button>
-    </div>
+<div class="profile-card">
+    <div class="profile-avatar" id="avatarFrame" onclick="document.getElementById('avatarInput').click()">SB</div>
+    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="previewAvatar(event)">
+    <h2>Seán Bellew</h2>
+    <p class="username">@SeanB29</p>
+    <p class="age">21</p>
+    <button onclick="toggleEdit()">Edit Profile</button>
 </div>
 
 <!-- Main Content -->
@@ -59,6 +58,22 @@ function toggleEdit() {
 
     if (newBio !== null) {
         bio.innerText = newBio;
+    }
+}
+
+function previewAvatar(event) {
+    const avatarFrame = document.getElementById("avatarFrame");
+    const file = event.target.files[0]; //Limits the user to only upload 1 image
+    
+    if (file) {
+        const reader = new FileReader(); //reads file
+        reader.onload = function(e) { //after file has been uplaoded correct
+            avatarFrame.style.backgroundImage = `url(${e.target.result})`;//chnaging the background image to the users file 
+            avatarFrame.innerText = ""; //clears text
+            avatarFrame.style.backgroundSize = "cover"; //will allow the image to fill the dimensionms
+            avatarFrame.style.backgroundPosition = "center";//centres the image
+        }
+        reader.readAsDataURL(file);//runs 
     }
 }
 </script>
