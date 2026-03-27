@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="/styles/login.css">
+</head>
+
+<body>
+    
+
+    <div class="container">
+
+        <!-- Registration Card -->
+        <div class="login-card">
+            <div class="icon">✈️</div>
+            <h2>Create Account</h2>
+            <p>Please fill in your details to register</p>
+
+            <!-- Registration Form -->
+            <form action="/register" method="POST">
+
+                <!-- Name -->
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required>
+                </div>
+
+                <!-- Email -->
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <!-- Password -->
+                <div class="input-group">
+                    <label>Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" id="password" required>
+                        <span id="togglePassword">👁️</span>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="confirm_password" id="confirmPassword" required>
+                        <span id="toggleConfirmPassword">👁️</span>
+                    </div>
+                </div>
+
+                <!-- Role for locla or tourist-->
+                <div class="options">
+                    <div>
+                        <input type="radio" name="role" value="Traveler" required> Traveler
+                        <input type="radio" name="role" value="Local" required> Local
+                    </div>
+                    <a href="/login">Already have an account? Log in</a>
+                </div>
+
+                <!-- Register Button -->
+                <button type="submit" class="login-btn">Register</button>
+
+            </form>
+        </div>
+
+        <!-- Right Side Image -->
+        <div class="image-side">
+            <img src="../styles/login.png" alt="Travelers">
+        </div>
+
+    </div>
+
+    
+    
+
+    <script>
+        // Toggle the password visibility witht the eye
+        const toggle = document.getElementById("togglePassword");
+        const password = document.getElementById("password");
+        const toggleConfirm = document.getElementById("toggleConfirmPassword");
+        const confirmPassword = document.getElementById("confirmPassword");
+
+        if(toggle && password){
+            toggle.addEventListener("click", () => {
+                password.type = password.type === "password" ? "text" : "password";
+            });
+        }
+
+        if(toggleConfirm && confirmPassword){
+            toggleConfirm.addEventListener("click", () => {
+                confirmPassword.type = confirmPassword.type === "password" ? "text" : "password";
+            });
+        }
+    </script>
+
+</body>
+</html>
