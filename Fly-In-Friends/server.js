@@ -49,7 +49,7 @@ function verifyTokenAndLoadPage(redirect, req,res){
   const token = req.cookies.session;
   if (!token){
     //missing token
-    res.redirect("loginError");
+    res.status(401).send("Session expired or invalid");
   }
   try {
     //if this verify doesnt pass(token isnt valid), code goes straight to catch case.
