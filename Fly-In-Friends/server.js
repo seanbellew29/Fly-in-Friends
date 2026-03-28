@@ -1,9 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
-
-
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const app = express();
+
+app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
@@ -23,6 +26,7 @@ app.use('/', messageRoutes);
 const {loadEnvFile} = require("node:process");
 loadEnvFile("secretData.env");
 const dbURI = process.env.APIK;
+const tokenKey = process.env.tokenKey;
 
 mongoose.connect(dbURI)
   .then(() => console.log("Connected to Fly-in-Friends database"))//display when connect
@@ -35,6 +39,31 @@ const User = mongoose.model('User', {
   password: String,
   role: String
 });
+
+function createToken(username,res){
+  const token = jwt.sign({ user: username }, tokenKey, { expiresIn: "5m" });
+  res.cookie("session", token, { httpOnly: true });
+}
+
+function verifyTokenAndLoadPage(redirect, req,res){
+  const token = req.cookies.session;
+  if (!token){
+    //missing token
+    res.redirect("loginError");
+  }
+  try {
+    //if this verify doesnt pass(token isnt valid), code goes straight to catch case.
+    jwt.verify(token, tokenKey);
+
+    //two lines below refresh the token to stay fresh when user is navigating or reloading pages
+    const userName = jwt.decode(token,{complete: true}).payload.user;
+    createToken(userName,res);
+    //sends user to desired page
+    res.render(redirect);
+  } catch {
+    res.status(401).send("Session expired or invalid");
+  }
+}
 
 //routing blocks
 app.get("/", function (req, res) {
@@ -49,34 +78,33 @@ app.get("/login", function (req, res) {
     res.render("login");
 });
 
-app.get("/chat-page", function (req, res) {
-    res.render("chat-page");
-});
-
-app.get("/map", function (req, res) {
-    res.render("map");
-});
-
-app.get("/profile-page", function (req, res) {
-    console.log("pass");
-    res.render("profile-page");
-});
-
-app.get("/listings", function (req, res) {
-    res.render("listings");
-});
-
-app.get("/message", function (req, res) {
-    res.render("chat-page");
-});
-
-//register page
 app.get('/register', (req, res) => {
   res.render('register'); 
 });
 
+app.get("/chat-page", function (req, res) {
+    verifyTokenAndLoadPage("chat-page",req,res);
+});
+
+app.get("/map", function (req, res) {
+    verifyTokenAndLoadPage("map",req,res);
+});
+
+app.get("/profile-page", function (req, res) {
+    verifyTokenAndLoadPage("profile-page",req,res);
+});
+
+app.get("/listings", function (req, res) {
+    verifyTokenAndLoadPage("listings",req,res);
+});
+
+app.get("/message", function (req, res) {
+    verifyTokenAndLoadPage("chat-page",req,res);
+});
+
 //POST functions
 app.post('/register', async (req, res) => {
+  //test
   console.log('req.body:', req.body);
 
   
@@ -103,8 +131,6 @@ app.post('/register', async (req, res) => {
   res.redirect('/login');//will redirect the user tp the login page when the user submits their info
 });
 
-app.get('/test', (req, res) => res.send('Server is running!'));//testing the server to run 
-
 // Handles login form submission
 app.post('/login', async (req, res) => {
   try {
@@ -116,6 +142,8 @@ app.post('/login', async (req, res) => {
 
         if (result === true) {
             //passwords match
+            createToken(username,res);
+
             res.redirect('/map');
         }else{
             //passwords do not match
