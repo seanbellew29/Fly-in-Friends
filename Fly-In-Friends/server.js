@@ -10,9 +10,9 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 app.use(express.static("public"));
 require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
+
 
 // Views engine
 app.set('view engine', 'ejs');
@@ -39,8 +39,35 @@ const User = mongoose.model('User', {
   role: String
 });
 
-function createToken(username,res){
-  const token = jwt.sign({ user: username }, tokenKey, { expiresIn: "5m" });
+//db message structure 
+const messageSchema = new mongoose.Schema({
+  sender: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
+  receiver: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
+  content: {
+    type: String,
+    required: true
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+module.exports = mongoose.model("Message", messageSchema);
+
+const messageRoutes = require("./messages.js");
+app.use("/", messageRoutes);
+
+function createToken(user, res) {
+  const token = jwt.sign({ userId: user._id, username: user.username }, tokenKey, { expiresIn: "5m" });
   res.cookie("session", token, { httpOnly: true });
 }
 
@@ -55,8 +82,8 @@ function verifyToken(req,res){
     jwt.verify(token, tokenKey);
 
     //two lines below refresh the token to stay fresh when user is navigating or reloading pages
-    const userName = jwt.decode(token,{complete: true}).payload.user;
-    createToken(userName,res);
+    const payload = jwt.verify(token, tokenKey);
+    createToken({ _id: payload.userId, username: payload.username }, res);
     //sends user to desired page
     return true;
   } catch {
@@ -203,31 +230,35 @@ app.post("/add-listing", async (req, res) => {
   }
 });
 
+
+
+
+
+
 // Handles login form submission
 app.post('/login', async (req, res) => {
   try {
-    const { username, password} = req.body;
-    const foundUser = await User.findOne({username:username});
+    const { username, password } = req.body;
+    const foundUser = await User.findOne({ username });
 
-    bcrypt.compare(password, foundUser.password, function(err, result) {
-        if (err) throw err;
+    if (!foundUser) return res.status(400).send("User was not found");
 
-        if (result === true) {
-            //passwords match
-            createToken(username,res);
+    const match = await bcrypt.compare(password, foundUser.password);
 
-            res.redirect('/map');
-        }else{
-            //passwords do not match
-            res.status(500).send('could not log in');
-        }
-    });
-
+    if (match) {
+        createToken(foundUser, res); //passwords match
+        res.redirect('/map');         
+    } else {
+        res.status(400).send("Invalid credentials");
+    }
   } catch (err) {
+    //passwords dont match
     console.error(err);
-    res.status(500).send('could not log in');
+    res.status(500).send("could not log in");
   }
 });
+
+  
 
 // Starts the server
 app.listen(3000, () => {
