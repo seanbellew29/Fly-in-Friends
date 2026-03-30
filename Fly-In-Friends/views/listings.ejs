@@ -1,42 +1,39 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-<title>Hangout Listings</title>
-<link rel="stylesheet" href="/styles/styles.css">
-<link rel="stylesheet" href="/styles/map.css">
+    <title>Hangout Listings</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/map.css">
 </head>
 
 <body>
 
-<%- include("partials/navbar"); %>
+    <%- include("partials/navbar"); %>
 
-<h1>Fly-in Friends</h1>
+    <h1>Fly-in Friends</h1>
 
-<a href="/map">Map</a> |
-<a href="/chat-page">Messages</a>
+    <a href="/map">Map</a> |
+    <a href="/chat-page">Messages</a>
 
-<h2>Available Hangouts</h2>
+    <h2>Add Your Own Listing</h2>
 
-<div class="listing">
-<h3>Temple Bar Meetup</h3>
-<p>Location: Temple Bar</p>
-<p>Activity: Drinks and music with locals.</p>
-</div>
+    <form action="/add-listing" method="POST" class="add-listing-form">
+        <input type="text" name="title" placeholder="Hangout title" required>
+        <input type="text" name="location" placeholder="Eircode or location" required>
+        <input type="text" name="activity" placeholder="Activity" required>
+        <button type="submit">Add Listing</button>
+    </form>
 
-<div class="listing">
-<h3>Dublin Castle Tour</h3>
-<p>Location: Dublin Castle</p>
-<p>Activity: Explore the historic castle.</p>
-</div>
+    <h2>Available Hangouts</h2>
 
-<div class="listing">
-<h3>River Liffey Walk</h3>
-<p>Location: River Liffey</p>
-<p>Activity: Casual evening walk through the city.</p>
-</div>
+    <% listings.forEach(listing => { %>
+        <div class="listing">
+            <h3><%= listing.title %></h3>
+            <p><strong>Location:</strong> <%= listing.location %></p>
+            <p><strong>Activity:</strong> <%= listing.activity %></p>
+        </div>
+    <% }) %>
 
-<%- include("partials/footer"); %>
+    <%- include("partials/footer"); %>
 </body>
-
 </html>
