@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
-const Listing = require("./models/Listing");
+const Listing = require("./models/Listings.js");
 const convertLocationToCoords = require("./locationConversion");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
@@ -105,6 +105,8 @@ app.get("/chat-page", function (req, res) {
   verifyTokenAndLoadPage("chat-page",req,res);
 });
 
+//loads all saved lsitings from mongoDB and sends them to listings.ejs
+//this allows users to view all currently available hangouts 
 app.get("/listings", async function (req, res) {
   if (verifyToken(req,res)){
     
@@ -121,17 +123,45 @@ app.get("/listings", async function (req, res) {
   }
 });
 
-app.get("/map", function (req, res) {
-    verifyTokenAndLoadPage("map",req,res);
+//loads all the listinngs and passes them into the map page 
+//the data is used in map.ejs / Sc riupt.js to generate Leaflet markers
+app.get("/map", async function (req, res) {
+  if (verifyToken(req, res)) {
+    try {
+      const listings = await Listing.find();
+      res.render("map", { listings });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error loading map page");
+    }
+  } else {
+    res.render("403");
+  }
+});
+
+//API route returns all listings as JSON
+//this can be used for frotnnds map features or future async loading
+app.get("/api/listings" , async function(req,res){
+  if(verifyToken(req, res)){
+    try{
+      const listings = await Listing.find();
+      res.json(listings);
+
+    }catch(error){
+      console.error(error);
+      res.status(500).json({error: "Error loading listings"});
+
+    }
+  }else {
+      res.status(403).json({error: "Forbidden"});
+    }
+
 });
 
 app.get("/profile-page", function (req, res) {
     verifyTokenAndLoadPage("profile-page",req,res);
 });
 
-app.get("/listings", function (req, res) {
-    verifyTokenAndLoadPage("listings",req,res);
-});
 
 app.get("/message", function (req, res) {
     verifyTokenAndLoadPage("chat-page",req,res);
@@ -166,6 +196,9 @@ app.post('/register', async (req, res) => {
 });
 
 // ADD LISTING
+//checks that all the feilds are filled amd prevents duplicates
+//converts the users input into long/lat
+//saves the completed listings to ongoDB for list and map dispolay
 app.post("/add-listing", async (req, res) => {
   const { title, location, activity } = req.body;
 
@@ -186,6 +219,7 @@ app.post("/add-listing", async (req, res) => {
       return res.status(400).send("Location not found");
     }
 
+    //creates  a new lsiting document including both text details and coordinates
     const newListing = new Listing({
       title,
       location,
@@ -196,6 +230,7 @@ app.post("/add-listing", async (req, res) => {
 
     await newListing.save();
 
+      //after saving it brings the yser tot thre listing page so the new entry is visible 
     res.redirect("/listings");
   } catch (error) {
     console.error(error);
