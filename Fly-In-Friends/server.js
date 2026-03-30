@@ -49,7 +49,7 @@ function verifyTokenAndLoadPage(redirect, req,res){
   const token = req.cookies.session;
   if (!token){
     //missing token
-    res.status(401).send("Session expired or invalid");
+    res.render("403");
   }
   try {
     //if this verify doesnt pass(token isnt valid), code goes straight to catch case.
@@ -61,7 +61,7 @@ function verifyTokenAndLoadPage(redirect, req,res){
     //sends user to desired page
     res.render(redirect);
   } catch {
-    res.status(401).send("Session expired or invalid");
+    res.render("403");
   }
 }
 
