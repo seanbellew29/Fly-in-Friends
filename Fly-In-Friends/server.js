@@ -3,9 +3,12 @@ const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
 const Listing = require("./models/Listing");
 const convertLocationToCoords = require("./locationConversion");
-
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const app = express();
 
+app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
@@ -13,8 +16,6 @@ require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
 
 // Views engine
 app.set('view engine', 'ejs');
-
-
 
 /*
 * environmental variables setup and MONGODB API KEY
@@ -24,6 +25,7 @@ app.set('view engine', 'ejs');
 const { loadEnvFile } = require("node:process");
 loadEnvFile("secretData.env");
 const dbURI = process.env.APIK;
+const tokenKey = process.env.tokenKey;
 
 mongoose.connect(dbURI)
   .then(() => console.log("Connected to Fly-in-Friends database"))
@@ -37,7 +39,52 @@ const User = mongoose.model('User', {
   role: String
 });
 
-// routing blocks
+function createToken(username,res){
+  const token = jwt.sign({ user: username }, tokenKey, { expiresIn: "5m" });
+  res.cookie("session", token, { httpOnly: true });
+}
+
+function verifyToken(req,res){
+  const token = req.cookies.session;
+  if (!token){
+    //missing token
+    return false;
+  }
+  try {
+    //if this verify doesnt pass(token isnt valid), code goes straight to catch case.
+    jwt.verify(token, tokenKey);
+
+    //two lines below refresh the token to stay fresh when user is navigating or reloading pages
+    const userName = jwt.decode(token,{complete: true}).payload.user;
+    createToken(userName,res);
+    //sends user to desired page
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function verifyTokenAndLoadPage(redirect, req,res){
+  const token = req.cookies.session;
+  if (!token){
+    //missing token
+    res.render("403");
+  }
+  try {
+    //if this verify doesnt pass(token isnt valid), code goes straight to catch case.
+    jwt.verify(token, tokenKey);
+
+    //two lines below refresh the token to stay fresh when user is navigating or reloading pages
+    const userName = jwt.decode(token,{complete: true}).payload.user;
+    createToken(userName,res);
+    //sends user to desired page
+    res.render(redirect);
+  } catch {
+    res.render("403");
+  }
+}
+
+//routing blocks
 app.get("/", function (req, res) {
   res.render("landing");
 });
@@ -50,40 +97,49 @@ app.get("/login", function (req, res) {
   res.render("login");
 });
 
+app.get('/register', (req, res) => {
+  res.render('register'); 
+});
+
 app.get("/chat-page", function (req, res) {
-  res.render("chat-page");
-});
-
-app.get("/map", function (req, res) {
-  res.render("map");
-});
-
-app.get("/profile-page", function (req, res) {
-  console.log("pass");
-  res.render("profile-page");
+  verifyTokenAndLoadPage("chat-page",req,res);
 });
 
 app.get("/listings", async function (req, res) {
-  try {
-    const listings = await Listing.find();
-    res.render("listings", { listings });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error loading listings page");
+  if (verifyToken(req,res)){
+    
+    try {
+      const listings = await Listing.find();
+      res.render("listings", { listings });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error loading listings page");
+    }
+    
+  }else{
+    res.render("403")
   }
 });
 
-app.get("/message", function (req, res) {
-  res.render("chat-page");
+app.get("/map", function (req, res) {
+    verifyTokenAndLoadPage("map",req,res);
 });
 
-// register page
-app.get('/register', (req, res) => {
-  res.render('register');
+app.get("/profile-page", function (req, res) {
+    verifyTokenAndLoadPage("profile-page",req,res);
+});
+
+app.get("/listings", function (req, res) {
+    verifyTokenAndLoadPage("listings",req,res);
+});
+
+app.get("/message", function (req, res) {
+    verifyTokenAndLoadPage("chat-page",req,res);
 });
 
 // POST functions
 app.post('/register', async (req, res) => {
+  //test
   console.log('req.body:', req.body);
 
   // The users credentials requirements
@@ -147,26 +203,24 @@ app.post("/add-listing", async (req, res) => {
   }
 });
 
-app.get('/test', (req, res) => res.send('Server is running!'));
-
 // Handles login form submission
 app.post('/login', async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const foundUser = await User.findOne({ username: username });
+    const { username, password} = req.body;
+    const foundUser = await User.findOne({username:username});
 
-    if (!foundUser) {
-      return res.status(500).send('could not log in');
-    }
+    bcrypt.compare(password, foundUser.password, function(err, result) {
+        if (err) throw err;
 
-    bcrypt.compare(password, foundUser.password, function (err, result) {
-      if (err) throw err;
+        if (result === true) {
+            //passwords match
+            createToken(username,res);
 
-      if (result === true) {
-        res.redirect('/map');
-      } else {
-        res.status(500).send('could not log in');
-      }
+            res.redirect('/map');
+        }else{
+            //passwords do not match
+            res.status(500).send('could not log in');
+        }
     });
 
   } catch (err) {
