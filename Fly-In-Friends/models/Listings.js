@@ -18,7 +18,7 @@ const listingSchema = new mongoose.Schema({
         required: true
     },
     longitude:{
-        type: Nummber,
+        type: Number,
         requiured:true
     },
     createdAt:{
