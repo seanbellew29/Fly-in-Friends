@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-
+//schema for users hangoutlistings
+//stores the text/ coordinats for the map
 const listingSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -18,7 +19,7 @@ const listingSchema = new mongoose.Schema({
         required: true
     },
     longitude:{
-        type: Nummber,
+        type: Number,
         requiured:true
     },
     createdAt:{
