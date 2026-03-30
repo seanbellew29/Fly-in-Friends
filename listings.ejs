@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hangout Listings</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/map.css">
+</head>
+
+<body>
+
+    <%- include("partials/navbar"); %>
+
+    <h1>Fly-in Friends</h1>
+
+    <a href="/map">Map</a> |
+    <a href="/chat-page">Messages</a>
+
+    <h2>Add Your Own Listing</h2>
+
+    <form action="/add-listing" method="POST" class="add-listing-form">
+        <input type="text" name="title" placeholder="Hangout title" required>
+        <input type="text" name="location" placeholder="Eircode or location" required>
+        <input type="text" name="activity" placeholder="Activity" required>
+        <button type="submit">Add Listing</button>
+    </form>
+
+    <h2>Available Hangouts</h2>
+
+    <% listings.forEach(listing => { %>
+        <div class="listing">
+            <h3><%= listing.title %></h3>
+            <p><strong>Location:</strong> <%= listing.location %></p>
+            <p><strong>Activity:</strong> <%= listing.activity %></p>
+        </div>
+    <% }) %>
+
+    <%- include("partials/footer"); %>
+</body>
+</html>
