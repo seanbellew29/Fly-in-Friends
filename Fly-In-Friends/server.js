@@ -147,7 +147,7 @@ app.get("/map", function (req, res) {
 
 app.get("/profile-page", function (req, res) {
     if (verifyToken(req)){
-      //refresh here
+      refreshToken(req, res);
       res.render("profile-page");
   }else{
     res.render("403");
@@ -156,7 +156,7 @@ app.get("/profile-page", function (req, res) {
 
 app.get("/listings", function (req, res) {
     if (verifyToken(req)){
-      //refresh here
+      refreshToken(req, res);
       res.render("listings");
   }else{
     res.render("403");
@@ -165,7 +165,7 @@ app.get("/listings", function (req, res) {
 
 app.get("/message", function (req, res) {
     if (verifyToken(req)){
-      //refresh here
+      refreshToken(req, res);
       res.render("chat-page");
   }else{
     res.render("403");
