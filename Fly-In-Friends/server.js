@@ -113,7 +113,7 @@ app.get('/register', (req, res) => {
 
 app.get("/chat-page", function (req, res) {
   if (verifyToken(req)){
-    //refresh here
+    refreshToken(req, res);
     res.render("chat-page");
   }else{
     res.render("403");
@@ -122,7 +122,7 @@ app.get("/chat-page", function (req, res) {
 
 app.get("/listings", async function (req, res) {
   if (verifyToken(req,res)){
-    //refresh here
+    refreshToken(req, res);
     try {
       const listings = await Listing.find();
       res.render("listings", { listings });
@@ -174,8 +174,6 @@ app.get("/message", function (req, res) {
 
 /****************************** POST FUNCTIONS BELOW **************************/
 app.post('/register', async (req, res) => {
-  //test
-  console.log('req.body:', req.body);
 
   // The users credentials requirements
   const { name, email, password, confirm_password, role } = req.body;
