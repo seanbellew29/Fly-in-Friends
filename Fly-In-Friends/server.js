@@ -36,7 +36,8 @@ const User = mongoose.model('User', {
   username: String,
   email: String,
   password: String,
-  role: String
+  role: String,
+  _id: Number
 });
 
 //db message structure 
@@ -66,9 +67,16 @@ module.exports = mongoose.model("Message", messageSchema);
 const messageRoutes = require("./messages.js");
 app.use("/", messageRoutes);
 
-function createToken(user, res) {
+function createNewToken(user, res) {
   const token = jwt.sign({ userId: user._id, username: user.username }, tokenKey, { expiresIn: "5m" });
   res.cookie("session", token, { httpOnly: true });
+}
+
+function refreshToken(req,res){
+  const token = req.cookies.session;
+  const originalDecoded = jwt.decode(token, {complete: true});
+  const refreshed = jwt.refresh(originalDecoded, "5m", tokenKey);
+  res.cookie("session", refreshed, { httpOnly: true });
 }
 
 function verifyToken(req,res){
@@ -80,38 +88,13 @@ function verifyToken(req,res){
   try {
     //if this verify doesnt pass(token isnt valid), code goes straight to catch case.
     jwt.verify(token, tokenKey);
-
-    //two lines below refresh the token to stay fresh when user is navigating or reloading pages
-    const payload = jwt.verify(token, tokenKey);
-    createToken({ _id: payload.userId, username: payload.username }, res);
-    //sends user to desired page
     return true;
   } catch {
     return false;
   }
 }
 
-function verifyTokenAndLoadPage(redirect, req,res){
-  const token = req.cookies.session;
-  if (!token){
-    //missing token
-    res.render("403");
-  }
-  try {
-    //if this verify doesnt pass(token isnt valid), code goes straight to catch case.
-    jwt.verify(token, tokenKey);
-
-    //two lines below refresh the token to stay fresh when user is navigating or reloading pages
-    const userName = jwt.decode(token,{complete: true}).payload.user;
-    createToken(userName,res);
-    //sends user to desired page
-    res.render(redirect);
-  } catch {
-    res.render("403");
-  }
-}
-
-//routing blocks
+/************************* GET FUNCTIONS, ROUTING ***********************************/
 app.get("/", function (req, res) {
   res.render("landing");
 });
@@ -129,12 +112,17 @@ app.get('/register', (req, res) => {
 });
 
 app.get("/chat-page", function (req, res) {
-  verifyTokenAndLoadPage("chat-page",req,res);
+  if (verifyToken(req)){
+    //refresh here
+    res.render("chat-page");
+  }else{
+    res.render("403");
+  }
 });
 
 app.get("/listings", async function (req, res) {
   if (verifyToken(req,res)){
-    
+    //refresh here
     try {
       const listings = await Listing.find();
       res.render("listings", { listings });
@@ -149,22 +137,42 @@ app.get("/listings", async function (req, res) {
 });
 
 app.get("/map", function (req, res) {
-    verifyTokenAndLoadPage("map",req,res);
+    if (verifyToken(req)){
+      refreshToken(req, res);
+      res.render("map");
+  }else{
+    res.render("403");
+  }
 });
 
 app.get("/profile-page", function (req, res) {
-    verifyTokenAndLoadPage("profile-page",req,res);
+    if (verifyToken(req)){
+      //refresh here
+      res.render("profile-page");
+  }else{
+    res.render("403");
+  }
 });
 
 app.get("/listings", function (req, res) {
-    verifyTokenAndLoadPage("listings",req,res);
+    if (verifyToken(req)){
+      //refresh here
+      res.render("listings");
+  }else{
+    res.render("403");
+  }
 });
 
 app.get("/message", function (req, res) {
-    verifyTokenAndLoadPage("chat-page",req,res);
+    if (verifyToken(req)){
+      //refresh here
+      res.render("chat-page");
+  }else{
+    res.render("403");
+  }
 });
 
-// POST functions
+/****************************** POST FUNCTIONS BELOW **************************/
 app.post('/register', async (req, res) => {
   //test
   console.log('req.body:', req.body);
@@ -181,9 +189,13 @@ app.post('/register', async (req, res) => {
   }
 
   try {
+    const userId = Math.floor(Math.random() * 10000);
+    console.log(userId);
     const hash = await bcrypt.hash(password, 10);
-    const newUser = new User({ username: name, email, password: hash, role });
+    const newUser = new User({ username: name, email, password: hash, role, _id: userId });
     await newUser.save();
+
+
 
     res.redirect('/login');
   } catch (err) {
@@ -231,10 +243,6 @@ app.post("/add-listing", async (req, res) => {
 });
 
 
-
-
-
-
 // Handles login form submission
 app.post('/login', async (req, res) => {
   try {
@@ -246,7 +254,7 @@ app.post('/login', async (req, res) => {
     const match = await bcrypt.compare(password, foundUser.password);
 
     if (match) {
-        createToken(foundUser, res); //passwords match
+        createNewToken(foundUser, res); //passwords match
         res.redirect('/map');         
     } else {
         res.status(400).send("Invalid credentials");
