@@ -18,8 +18,6 @@ require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
 app.set('view engine', 'ejs');
 
 /*
-* environmental variables setup and MONGODB API KEY
-* available variables: 
 * to import a variable from .env file, use     x = process.env.{VARIABLENAME};
 */
 const { loadEnvFile } = require("node:process");
@@ -75,8 +73,10 @@ function createNewToken(user, res) {
 function refreshToken(req,res){
   const token = req.cookies.session;
   const originalDecoded = jwt.decode(token, {complete: true});
-  const refreshed = jwt.refresh(originalDecoded, "5m", tokenKey);
-  res.cookie("session", refreshed, { httpOnly: true });
+  let id = {userId:originalDecoded.payload.userId};
+  let username = {username:originalDecoded.payload.username};
+  const newToken = jwt.sign({id,username},tokenKey,{expiresIn:"5m"});
+  res.cookie("session", newToken, { httpOnly: true });
 }
 
 function verifyToken(req,res){
