@@ -1,31 +1,37 @@
 const axios = require("axios");
-//converts the users iput eircode into lattitude and longitude
-//uses the openStreetMap geocoding service
-async function convertLocationToCoords(location){
-    try{
-        const response = await axios.get("https://nominatim.openstreetmap.org/search",{
+
+async function convertLocationToCoords(location) {
+    try {
+        const apiKey = process.env.GEOAPIFY_KEY;
+
+        const response = await axios.get("https://api.geoapify.com/v1/geocode/search", {
             params: {
-                q: `${location}, Dublin, Ireland`,
+                text: location,
                 format: "json",
-                limit: 1
-            },
-            headers:{
-                "User-Agent": "FlyInFriendsApp"
+                limit: 1,
+                filter: "countrycode:ie",
+                apiKey: apiKey
             }
         });
-        //if there isnt any matching location it will return null
-        if (!response.data || response.data.length === 0){
+
+        if (!response.data || response.data.results.length === 0) {
             return null;
         }
-        //return latitude and longitude as numbers
-        return{
-            latitude: parseFloat(response.data[0].lat),
-            longitude: parseFloat(response.data[0].lon)
+
+        const result = response.data.results[0];
+
+        console.log("User entered:", location);
+        console.log("Geoapify result:", result);
+
+        return {
+            latitude: result.lat,
+            longitude: result.lon
         };
-    }catch(error){
-        console.error("Error converting location", error.message);
+
+    } catch (error) {
+        console.error("Error converting location:", error.message);
         return null;
     }
-
 }
+
 module.exports = convertLocationToCoords;
