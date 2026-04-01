@@ -4,7 +4,7 @@ body {
     background: #f1f3f6;
 }
 
-/* PAGE WRAPPER */
+
 .page-container {
     padding: 10px 30px 20px;
 }
@@ -95,9 +95,9 @@ body {
     font-size: 14px;
 }
 
-/* HOVER EFFECT */
-.listing:hover,
-.add-listing-card:hover {
+/* hover affect */
+
+ .listing:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
