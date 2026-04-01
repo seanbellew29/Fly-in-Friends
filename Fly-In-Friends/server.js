@@ -217,8 +217,12 @@ app.post('/register', async (req, res) => {
   }
 
   try {
-    const userId = Math.floor(Math.random() * 10000);
-    console.log(userId);
+    //generate unique User ID
+    var userId = Math.floor(Math.random() * 10000);
+    while (await User.findOne({ userId })){
+      userId = Math.floor(Math.random() * 10000);
+    }
+
     const hash = await bcrypt.hash(password, 10);
     const newUser = new User({ username: name, email, password: hash, role, _id: userId });
     await newUser.save();
