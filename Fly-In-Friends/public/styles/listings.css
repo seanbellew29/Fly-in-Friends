@@ -1,170 +1,103 @@
-
 body {
-    margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #dfe3e8;
-    color: #0b1f33;
+    margin: 0;
+    background: #f1f3f6;
 }
 
-
+/* PAGE WRAPPER */
 .page-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px 20px 40px;
+    padding: 10px 30px 20px;
 }
 
-.page-title {
-    font-size: 2.4rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-    color: #000;
+/* TITLE */
+.main-title {
+    font-size: 36px;
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
-/* Small links under heading */
-.quick-links {
-    margin-bottom: 28px;
+/* NAV LINKS */
+.nav-links {
+    margin-bottom: 20px;
 }
 
-.quick-links a {
-    color: #4b1fa8;
-    font-size: 1rem;
-    font-weight: 500;
+.nav-links a {
+    color: #0A447E;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.nav-links a:hover {
     text-decoration: underline;
-    margin-right: 10px;
 }
 
-/* content card */
-.section-card {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 28px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+/* ADD LISTING CARD */
+.add-listing-card {
+    background: white;
+    padding: 18px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
 }
 
-/* Section headings */
-.section-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin: 0 0 16px;
-    color: #000;
-}
-
-/* Add listing form layout */
+/* FORM */
 .add-listing-form {
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
+    margin-top: 12px;
 }
 
-/* Form inputs */
 .add-listing-form input {
-    flex: 1 1 220px;
-    min-width: 180px;
-    padding: 10px 12px;
-    border: 2px solid #c7d0db;
-    border-radius: 14px;
-    font-size: 0.95rem;
-    background-color: #f8fafc;
-    outline: none;
-    transition: 0.2s ease;
+    flex: 1;
+    padding: 9px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
 }
 
-
-.add-listing-form input:focus {
-    border-color: #0A447E;
-    background-color: #fff;
-    box-shadow: 0 0 0 3px rgba(10, 68, 126, 0.12);
-}
-
-/* Submit button */
 .add-listing-form button {
-    padding: 10px 16px;
-    border: none;
-    border-radius: 14px;
     background: #0A447E;
     color: white;
-    font-size: 0.95rem;
-    font-weight: 700;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 10px;
     cursor: pointer;
-    transition: 0.2s ease;
+    font-weight: bold;
 }
 
-/* Button hover effect */
 .add-listing-form button:hover {
     background: #08315c;
-    transform: translateY(-1px);
 }
 
-/* Listings container */
-.listings-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+/* SECTION TITLE */
+.section-title {
+    margin-bottom: 10px;
 }
 
-/* Single listing card */
+/* LISTING CARDS */
 .listing {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 18px 20px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    border-left: 6px solid #0A447E;
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-left: 5px solid #0A447E;
     transition: 0.2s ease;
 }
 
-/* Listing hover effect */
-.listing:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
-}
-
-/* Listing title */
 .listing h3 {
-    margin: 0 0 12px;
-    font-size: 1.5rem;
+    margin-top: 0;
     color: #0A447E;
 }
 
-/* Listing text */
 .listing p {
     margin: 6px 0;
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 14px;
 }
 
-/* Bold labels inside listing */
-.listing strong {
-    color: #102a43;
-}
-
-/* Mobile*/
-@media (max-width: 768px) {
-    .page-container {
-        padding: 16px 14px 32px;
-    }
-
-    .page-title {
-        font-size: 2rem;
-    }
-
-    .section-title {
-        font-size: 1.5rem;
-    }
-
-    .add-listing-form {
-        flex-direction: column;
-    }
-
-    .add-listing-form button {
-        width: 100%;
-    }
-
-    .listing h3 {
-        font-size: 1.3rem;
-    }
-
-    .listing p {
-        font-size: 0.95rem;
-    }
+/* HOVER EFFECT */
+.listing:hover,
+.add-listing-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
