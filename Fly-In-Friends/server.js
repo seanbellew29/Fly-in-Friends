@@ -68,7 +68,6 @@ app.use("/", messageRoutes);
 function createNewToken(user, res) {
   let tokenPayload = { userId: user._id, "username": user.username };
   const token = jwt.sign(tokenPayload, tokenKey, { expiresIn: "5m" });
-  console.log(jwt.decode(token, {complete: true}));
   res.cookie("session", token, { httpOnly: true });
 }
 
