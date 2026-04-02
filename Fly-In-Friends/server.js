@@ -66,16 +66,18 @@ const messageRoutes = require("./messages.js");
 app.use("/", messageRoutes);
 
 function createNewToken(user, res) {
-  const token = jwt.sign({ userId: user._id, username: user.username }, tokenKey, { expiresIn: "5m" });
+  let tokenPayload = { userId: user._id, "username": user.username };
+  const token = jwt.sign(tokenPayload, tokenKey, { expiresIn: "5m" });
+  console.log(jwt.decode(token, {complete: true}));
   res.cookie("session", token, { httpOnly: true });
 }
 
 function refreshToken(req,res){
   const token = req.cookies.session;
   const originalDecoded = jwt.decode(token, {complete: true});
-  let id = {userId:originalDecoded.payload.userId};
-  let username = {username:originalDecoded.payload.username};
-  const newToken = jwt.sign({id,username},tokenKey,{expiresIn:"5m"});
+  const id = originalDecoded.payload.userId;
+  const username = originalDecoded.payload.username;
+  const newToken = jwt.sign({userId:id,username},tokenKey,{expiresIn:"5m"});
   res.cookie("session", newToken, { httpOnly: true });
 }
 
@@ -260,13 +262,17 @@ app.post("/add-listing", async (req, res) => {
       return res.status(400).send("Location not found");
     }
 
+    const token = req.cookies.session;
+    const originalDecoded = jwt.decode(token, {complete: true});
+    const Uid = originalDecoded.payload.userId;
     //creates  a new lsiting document including both text details and coordinates
     const newListing = new Listing({
       title,
       location,
       activity,
       latitude: coords.latitude,
-      longitude: coords.longitude
+      longitude: coords.longitude,
+      userId: Uid
     });
 
     await newListing.save();
