@@ -153,6 +153,34 @@ body {
     opacity: 0.95;
 }
 
+.conversation-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+}
+
+.conversation-item:hover {
+    background-color: #f0f0f0;
+}
+
+.conversation-item.active {
+    background-color: #1383ec; /*Colour when user is active with other user*/
+}
+
+.convo-username {
+    font-weight: bold;
+}
+
+.convo-preview {
+    font-size: 0.8em;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /*MOBILE*/
 @media (max-width: 900px) {
     .chat-wrapper {
@@ -166,4 +194,5 @@ body {
     .message {
         max-width: 80%;
     }
+    
 }
