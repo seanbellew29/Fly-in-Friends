@@ -29,6 +29,13 @@ mongoose.connect(dbURI)
   .then(() => console.log("Connected to Fly-in-Friends database"))
   .catch(err => console.error("Database connection error:", err));
 
+  // Using this function to parse the id from a query 
+function parseUserId(id) {
+  const num = parseInt(id);
+  return isNaN(num) ? null : num;
+}
+
+
 // The db structure
 const User = mongoose.model('User', {
   username: String,
@@ -41,13 +48,11 @@ const User = mongoose.model('User', {
 //db message structure 
 const messageSchema = new mongoose.Schema({
   sender: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type: Number, // matches the users id 
     required: true
   },
   receiver: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type: Number,
     required: true
   },
   content: {
@@ -60,10 +65,7 @@ const messageSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model("Message", messageSchema);
-
-const messageRoutes = require("./messages.js");
-app.use("/", messageRoutes);
+const Message = mongoose.model("Message", messageSchema);
 
 function createNewToken(user, res) {
   let tokenPayload = { userId: user._id, "username": user.username };
@@ -88,9 +90,9 @@ function verifyToken(req,res){
   }
   try {
     //if this verify doesnt pass(token isnt valid), code goes straight to catch case.
-    jwt.verify(token, tokenKey);
-    return true;
-  } catch {
+    const decoded = jwt.verify(token, tokenKey);
+    return decoded;
+  } catch (err){
     return false;
   }
 }
@@ -112,32 +114,63 @@ app.get('/register', (req, res) => {
   res.render('register'); 
 });
 
-app.get("/chat-page", function (req, res) {
-  if (verifyToken(req)){
-    refreshToken(req, res);
-    res.render("chat-page");
-  }else{
-    res.render("403");
-  }
-});
+
+
+app.get("/chat-page", async function (req, res) {
+    if (!verifyToken(req)) 
+      return res.render("403"); //verfies the users token
+
+    refreshToken(req, res); //extends the session
+
+    const otherUserId = parseInt(req.query.userId, 10);// had to parse the query 
+
+    if (isNaN(otherUserId)) {
+        return res.render("chat-page", { otherUserId: null, otherUsername: null });
+    }
+
+    let otherUsername = null;
+
+    if (otherUserId !== null) {
+        try {
+            const user = await User.findOne({ _id: otherUserId });
+            if (user) otherUsername = user.username;
+        } catch (err) {
+            console.error("Error fetching other user:", err);
+        }
+    }
+
+    // Renders the chat-page 
+    res.render("chat-page", { otherUserId, otherUsername });
+}); 
+
+
 
 //loads all saved lsitings from mongoDB and sends them to listings.ejs
 //this allows users to view all currently available hangouts 
 app.get("/listings", async function (req, res) {
-  if (verifyToken(req,res)){
+  if (verifyToken(req)){
     refreshToken(req, res);
     try {
       const listings = await Listing.find();
-      res.render("listings", { listings });
+
+      // add username of the creator for each listing
+      const listingsWithUser = await Promise.all(listings.map(async (listing) => {
+        const user = await User.findOne({ _id: listing.userId });
+        return {
+          ...listing._doc, 
+          username: user ? user.username : "Unknown User"
+        };
+      }));
+
+      res.render("listings", { listings: listingsWithUser });
     } catch (error) {
       console.error(error);
       res.status(500).send("Error loading listings page");
     }
-    
-  }else{
+  } else {
     res.render("403")
   }
-});
+});//--look back at this//
 
 //loads all the listinngs and passes them into the map page 
 //the data is used in map.ejs / Sc riupt.js to generate Leaflet markers
@@ -185,23 +218,53 @@ app.get("/profile-page", function (req, res) {
   }
 });
 
-app.get("/listings", function (req, res) {
-    if (verifyToken(req)){
-      refreshToken(req, res);
-      res.render("listings");
-  }else{
-    res.render("403");
+app.get("/message/:userId", async function (req, res) { //Loads the chat page
+  const decoded = verifyToken(req); //takes the users logged in info
+  if (!decoded) return res.render("403");
+ 
+  refreshToken(req, res);
+ 
+  const currentUserId = decoded.userId;
+  const otherUserId = parseInt(req.params.userId, 10); //takes both users ids the logged in user and the other from url
+  if (isNaN(otherUserId)) return res.status(400).send("Invalid user ID");
+ 
+  try {
+    const user = await User.findOne({ _id: otherUserId });
+    if (!user) return res.status(404).send("User not found");
+ 
+    const otherUsername = user.username;
+    res.render("chat-page", { otherUserId, otherUsername, currentUserId }); //takes the other users username and renders the chat page
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading chat page");
   }
 });
 
-app.get("/message", function (req, res) {
-    if (verifyToken(req)){
-      refreshToken(req, res);
-      res.render("chat-page");
-  }else{
-    res.render("403");
+
+app.get("/messages/:userId", async (req, res) => {//fetches the chat history data
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).send("Unauthorized");
+ 
+  const currentUserId = decoded.userId;
+  const otherUserId = parseInt(req.params.userId, 10);
+ 
+  if (isNaN(otherUserId)) return res.status(400).send("Invalid user ID");
+ 
+  try {
+    const messages = await Message.find({
+      $or: [
+        { sender: currentUserId, receiver: otherUserId },
+        { sender: otherUserId, receiver: currentUserId }
+      ]
+    }).sort({ timestamp: 1 });//takes the two users messages from the db
+ 
+    res.json(messages);//returns in json
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading messages");
   }
 });
+
 
 /****************************** POST FUNCTIONS BELOW **************************/
 app.post('/register', async (req, res) => {
@@ -308,6 +371,37 @@ app.post('/login', async (req, res) => {
   }
 });
 
+//Hndles messages from users
+app.post("/send-message", async (req, res) => {
+ 
+  const decoded = verifyToken(req);
+  if (!decoded)
+     return res.status(401).send("Unauthorized");
+ 
+  try {
+    const { receiverId, content } = req.body;
+ 
+    const receiverIdNum = parseInt(receiverId, 10);
+    if (isNaN(receiverIdNum) || !content || content.trim() === "") { //takes receiver and content to validate
+      return res.status(400).send("Invalid or missing fields");
+    }
+ 
+    const senderId = decoded.userId; //this is going to take the users id who sends message from token
+ 
+    const newMessage = new Message({
+      sender: senderId,
+      receiver: receiverIdNum,
+      content
+    });
+ 
+    await newMessage.save(); //saves to db
+    res.status(200).json({ message: "Message sent" });
+ 
+  } catch (err) {
+    console.error("Error sending the message:", err);
+    res.status(500).send(err.message);
+  }
+});
   
 
 // Starts the server
