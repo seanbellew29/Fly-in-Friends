@@ -40,6 +40,11 @@
                 <h3><%= listing.title %></h3>
                 <p><strong>Location:</strong> <%= listing.location %></p>
                 <p><strong>Activity:</strong> <%= listing.activity %></p>
+                <p><strong>Posted by:</strong> <%= listing.username %></p> 
+                 <form action="/message/<%= listing.userId %>" method="get">
+          <button type="submit">Message User </button>
+      </form>
+
             </div>
         <% }) %>
 
