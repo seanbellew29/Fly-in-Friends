@@ -266,6 +266,45 @@ app.get("/messages/:userId", async (req, res) => {//fetches the chat history dat
 });
 
 
+app.get("/conversations", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).send("Unauthorized");
+
+  const currentUserId = decoded.userId;
+
+  try {
+    const messages = await Message.find({
+      $or: [
+        { sender: currentUserId },
+        { receiver: currentUserId }
+      ]
+    }).sort({ timestamp: -1 });//going to sort it fisrt to last
+
+   
+    const seenIds = new Set();//this is going to make sure the user will display once on the sidebar
+    const conversations = [];
+
+    for (const msg of messages) {
+      const otherId = msg.sender === currentUserId ? msg.receiver : msg.sender;
+
+      if (!seenIds.has(otherId)) {
+        seenIds.add(otherId);
+        const user = await User.findOne({ _id: otherId });
+        if (user) {
+          conversations.push({ userId: otherId, username: user.username, lastMessage: msg.content });
+        }//takes the username from the db and makes a convo object with id username contents
+      }
+    }
+
+    res.json(conversations);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error loading conversations");
+  }
+});
+
+
 /****************************** POST FUNCTIONS BELOW **************************/
 app.post('/register', async (req, res) => {
 
