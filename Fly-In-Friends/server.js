@@ -1,3 +1,4 @@
+
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
@@ -6,12 +7,12 @@ const convertLocationToCoords = require("./locationConversion");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const app = express();
-
+app.use(express.static("public"));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
 require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
+
 
 
 // Views engine
@@ -20,6 +21,7 @@ app.set('view engine', 'ejs');
 /*
 * to import a variable from .env file, use     x = process.env.{VARIABLENAME};
 */
+
 const { loadEnvFile } = require("node:process");
 loadEnvFile("secretData.env");
 const dbURI = process.env.APIK;
@@ -45,6 +47,19 @@ const User = mongoose.model('User', {
   _id: Number
 });
 
+//db structure for profile
+const profileSchema = new mongoose.Schema({
+  userId: { type: Number, required: true, unique: true }, 
+  age: { type: Number },
+  location: { type: String, default: "" },
+  interests: { type: [String], default: [] },
+  plans: { type: [String], default: [] },
+  joined: { type: String, default: new Date().toISOString() },
+  avatar: { type: String, default: "" }
+});
+
+const Profile = mongoose.model("Profile", profileSchema);
+
 //db message structure 
 const messageSchema = new mongoose.Schema({
   sender: {
@@ -69,7 +84,7 @@ const Message = mongoose.model("Message", messageSchema);
 
 function createNewToken(user, res) {
   let tokenPayload = { userId: user._id, "username": user.username };
-  const token = jwt.sign(tokenPayload, tokenKey, { expiresIn: "5m" });
+  const token = jwt.sign(tokenPayload, tokenKey, { expiresIn: "20m" });
   res.cookie("session", token, { httpOnly: true });
 }
 
@@ -78,7 +93,7 @@ function refreshToken(req,res){
   const originalDecoded = jwt.decode(token, {complete: true});
   const id = originalDecoded.payload.userId;
   const username = originalDecoded.payload.username;
-  const newToken = jwt.sign({userId:id,username},tokenKey,{expiresIn:"5m"});
+  const newToken = jwt.sign({userId:id,username},tokenKey,{expiresIn:"20m"});
   res.cookie("session", newToken, { httpOnly: true });
 }
 
@@ -114,6 +129,43 @@ app.get('/register', (req, res) => {
   res.render('register'); 
 });
 
+app.get("/profile-page", (req, res) => {
+  if (!verifyToken(req)) 
+    return res.redirect("/login");
+  refreshToken(req, res);
+  res.render("profile-page"); 
+});
+
+// getting the data from the json 
+
+app.get("/profile", async (req, res) => {
+  console.log("GET /profile route hit");
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+  refreshToken(req, res);
+
+  try {
+    let profile = await Profile.findOne({ userId: decoded.userId }); //profile details to match the user id
+    if (!profile) {
+      profile = new Profile({ userId: decoded.userId, joined: new Date().toISOString() }); 
+      await profile.save();//toISOString fro date and time format using this easier to store in the db
+    }
+    const user = await User.findOne({ _id: decoded.userId });
+    res.json({
+      username: user ? user.username : "",
+      age: profile.age || null,
+      location: profile.location || "",
+      interests: profile.interests || [],
+      plans: profile.plans || [],
+      joined: profile.joined,
+       avatar: profile.avatar || ""
+    });//combining the user and profile data into a json object 
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error loading profile" });
+  }
+});
 
 
 app.get("/chat-page", async function (req, res) {
@@ -209,14 +261,9 @@ app.get("/api/listings" , async function(req,res){
 
 });
 
-app.get("/profile-page", function (req, res) {
-    if (verifyToken(req)){
-      refreshToken(req, res);
-      res.render("profile-page");
-  }else{
-    res.render("403");
-  }
-});
+// this is going to render the profile page -- issues with profile 
+
+
 
 app.get("/message/:userId", async function (req, res) { //Loads the chat page
   const decoded = verifyToken(req); //takes the users logged in info
@@ -327,10 +374,14 @@ app.post('/register', async (req, res) => {
     }
 
     const hash = await bcrypt.hash(password, 10);
-    const newUser = new User({ username: name, email, password: hash, role, _id: userId });
+    const newUser = new User({ username: name, email, password: hash, role, _id: userId, interests: [], plans: []  });
     await newUser.save();
 
-
+    const newProfile = new Profile({
+     userId: userId,
+     joined: new Date().toISOString()
+    });
+    await newProfile.save();
 
     res.redirect('/login');
   } catch (err) {
@@ -441,9 +492,39 @@ app.post("/send-message", async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-  
+
+
+app.post("/profile", async (req, res) => {
+  const decoded = verifyToken(req);
+  if (!decoded) return res.status(401).json({ error: "Unauthorized" });
+
+  refreshToken(req, res);
+
+  const { age, location, interests, plans } = req.body;
+  const updates = {};
+  if (age !== undefined) updates.age = age;
+  if (location !== undefined) updates.location = location;
+  if (interests !== undefined) updates.interests = interests;
+  if (plans !== undefined) updates.plans = plans;
+  if (req.body.avatar !== undefined) updates.avatar = req.body.avatar; //the profiles updates
+
+  try {
+    const updated = await Profile.findOneAndUpdate( //updates db
+      { userId: decoded.userId },
+      { $set: updates },
+      { new: true, upsert: true } // createing the profile if it doesn't exist
+    );
+     console.log("Profile updated:", updated);
+    res.json({ success: true, profile: updated });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error saving profile" });
+  }
+});
 
 // Starts the server
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
 });
+
+
