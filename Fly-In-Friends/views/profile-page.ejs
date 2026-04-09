@@ -9,78 +9,188 @@
 </head>
 <body>
 
-    <%- include("partials/navbar"); %>
+<%- include("partials/navbar"); %>
 
 <div class="profile-wrapper">
 
-   <!-- Left Sidebar -->
-<div class="profile-card">
-    <div class="profile-avatar" id="avatarFrame" onclick="document.getElementById('avatarInput').click()">SB</div>
+  <!-- Left Sidebar -->
+  <div class="profile-card">
+    <div class="profile-avatar" id="avatarFrame" onclick="document.getElementById('avatarInput').click()">
+      <span id="avatarInitials"></span>
+    </div>
     <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="previewAvatar(event)">
-    <h2>Seán Bellew</h2>
-    <p class="username">@SeanB29</p>
-    <p class="age">21</p>
-    <button onclick="toggleEdit()">Edit Profile</button>
-</div>
 
-<!-- Main Content -->
-<div class="profile-content">
+    <input type="text" id="displayName" class="profile-input profile-name" placeholder="Your name..." value="">
 
-        <div class="about-section">
-            <h2>Interests</h2>
-            <p id="bioText">
-                Music Festivals, Street food, Hiking
-            </p>
-        </div>
+    <input type="number" id="ageField" class="profile-input profile-age" placeholder="Age" min="13" max="120" value="">
 
-        <div class="info-section">
-            <h2>Information</h2>
-            <p><strong>Location:</strong> Munich, Germany</p>
-            <p><strong>Joined:</strong> January 2025</p>
-        </div>
+    <button onclick="saveProfile()">Save changes</button>
+    <span id="saveMsg" style="display:none; font-size:13px; color:green;">Saved!</span>
+  </div>
 
-        <div class="activity-section">
-            <h2>Travel Plans</h2>
-            <ul>
-                <li>Temple Bar later?</li>
-              
-            </ul>
-        </div>
+  <!-- Main Content -->
+  <div class="profile-content">
 
+    <div class="about-section">
+      <h2>Interests</h2>
+      <div id="interestTags" class="tag-row"></div>
+      <button onclick="addInterest()" class="small-btn">+ Add interest</button>
     </div>
 
+    <div class="info-section">
+      <h2>Information</h2>
+      <p><strong>Location:</strong>
+        <input type="text" id="locationField" class="profile-input" placeholder="Your city..." value="">
+      </p>
+      <p><strong>Joined:</strong> <span id="joinedDate"></span></p>
+    </div>
+
+    <div class="activity-section">
+      <h2>Travel Plans</h2>
+      <ul id="plansList"></ul>
+      <button onclick="addPlan()" class="small-btn">+ Add plan</button>
+    </div>
+
+  </div>
 </div>
 
 <script>
-function toggleEdit() {
-    const bio = document.getElementById("bioText");
+let interests = [];
+let plans = [];
 
-    const newBio = prompt("Edit your bio:", bio.innerText);
+// Loads the  profile from server
+async function loadProfile() {
+  try {
+    const res = await fetch("/profile");
+    if (!res.ok) throw new Error("Failed to fetch profile");
 
-    if (newBio !== null) {
-        bio.innerText = newBio;
-    }
+    const data = await res.json();
+
+    //fields for profile
+    document.getElementById("displayName").value = data.username || "";
+    document.getElementById("usernameField").value = data.username ? "@" + data.username : "";
+    document.getElementById("ageField").value = data.age || "";
+    document.getElementById("locationField").value = data.location || "";
+    document.getElementById("joinedDate").textContent = data.joined || "";
+
+   
+
+    // Interests and plans
+    interests = data.interests || [];
+    plans = data.plans || [];
+    renderInterests();
+    renderPlans();
+
+  } catch (err) {
+    console.error(err);
+  }
 }
 
+// --- INTERESTS ---
+function renderInterests() {
+  const row = document.getElementById("interestTags");
+  row.innerHTML = "";
+  interests.forEach((interest, i) => {
+    const tag = document.createElement("span");
+    tag.className = "interest-tag";
+    tag.innerHTML = `${interest} <span class="remove-tag" onclick="removeInterest(${i})">×</span>`;
+    row.appendChild(tag);
+  });
+}
+
+
+function addInterest() {
+  const val = prompt("New interest:");
+  if (!val || !val.trim())
+   
+  return;
+
+  interests.push(val.trim());
+  renderInterests();
+
+
+}
+function removeInterest(i) {
+  interests.splice(i, 1);
+  renderInterests();
+}
+
+// --- PLANS ---
+function renderPlans() {
+  const list = document.getElementById("plansList");
+  list.innerHTML = "";
+  plans.forEach((plan, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <input type="text" class="profile-input plan-input" value="${plan}" 
+             oninput="plans[${i}] = this.value" placeholder="Enter a travel plan...">
+      <span class="remove-tag" onclick="removePlan(${i})">×</span>
+    `;
+    list.appendChild(li);
+  });
+}
+function addPlan() {
+  plans.push("");//adding a new empty string
+  renderPlans();
+  const inputs = document.querySelectorAll(".plan-input");
+  if (inputs.length) inputs[inputs.length-1].focus();
+}
+function removePlan(i) {
+  plans.splice(i, 1);
+  renderPlans();
+}
+
+// --- SAVE PROFILE ---
+async function saveProfile() {
+  const payload = {
+    age: parseInt(document.getElementById("ageField").value) || null,
+    location: document.getElementById("locationField").value.trim(),
+    interests,
+    plans
+  };
+
+  try {
+    const res = await fetch("/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error("Failed to save profile");
+
+    const data = await res.json();
+    console.log("Profile saved:", data);
+
+    const msg = document.getElementById("saveMsg");
+    msg.style.display = "inline";
+    setTimeout(() => msg.style.display = "none", 2500);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to save profile. Try again.");
+  }
+}
+
+// --- the users avatar---
 function previewAvatar(event) {
-    const avatarFrame = document.getElementById("avatarFrame");
-    const file = event.target.files[0]; //Limits the user to only upload 1 image
-    
-    if (file) {
-        const reader = new FileReader(); //reads file
-        reader.onload = function(e) { //after file has been uplaoded correct
-            avatarFrame.style.backgroundImage = `url(${e.target.result})`;//chnaging the background image to the users file 
-            avatarFrame.innerText = ""; //clears text
-            avatarFrame.style.backgroundSize = "cover"; //will allow the image to fill the dimensionms
-            avatarFrame.style.backgroundPosition = "center";//centres the image
-        }
-        reader.readAsDataURL(file);//runs 
-    }
+  const avatarFrame = document.getElementById("avatarFrame");
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    avatarFrame.style.backgroundImage = `url(${e.target.result})`;
+    document.getElementById("avatarInitials").textContent = "";
+    avatarFrame.style.backgroundSize = "cover";
+    avatarFrame.style.backgroundPosition = "center";
+  };
+  reader.readAsDataURL(file);
 }
+
+// Loads profile on page load
+loadProfile();
 </script>
 
 <%- include("partials/footer"); %>
 
 </body>
 </html>
-    
