@@ -1,10 +1,9 @@
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #dfe3e8;
+    font-family: Arial, sans-serif; /*page font for the profile*/
+    background: #ccdaeb;
 }
 
-/* whole page wrapper */
 .profile-wrapper {
     max-width: 1200px;
     margin: 40px auto;
@@ -15,13 +14,9 @@ body {
     align-items: start;
 }
 
-/* left side */
-.profile-sidebar {
-    width: 100%;
-}
+.profile-sidebar { width: 100%; }
 
-/* card looks shared  */
-.profile-card,
+.profile-card,/*going to have all the cards design*/
 .about-section,
 .info-section,
 .activity-section {
@@ -32,65 +27,88 @@ body {
     transition: 0.2s ease;
 }
 
-/* hover effect on the interests , info and travel plans  */
 .about-section:hover,
 .info-section:hover,
 .activity-section:hover {
-    transform: translateY(-3px);
+    transform: translateY(-3px); /*When hoovering over sections they will lift up */
 }
 
-/* profile card */
-.profile-card {
+.profile-card { /*left card*/
     text-align: center;
+    min-height: 590px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
 }
 
-/* avatar */
-.profile-avatar {
-    width: 95px;
-    height: 95px;
+.profile-avatar {/*Where user will put image*/
+    width: 270px;
+    height: 270px;
     background: #0A447E;
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
-    font-weight: bold;
-    margin: 0 auto 18px auto;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 auto 8px auto;
+    cursor: pointer;
 }
 
-.profile-card h2 {
-    margin: 0 0 10px 0;
-    font-size: 24px;
+
+.profile-input {/*the input fields */
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    background: #f7f9fb;
+    color: #1a1a1a;
+    font-size: 15px;
+    font-family: Arial, sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
 }
 
-.username {
-    color: #666;
-    margin-bottom: 10px;
+.profile-input:focus {/*inputted text will display diff colour*/
+    border-color: #249D8F;
+    box-shadow: 0 0 0 3px rgba(36, 157, 143, 0.12);
+    background: #fff;
 }
 
-.age {
-    font-weight: bold;
-    margin-bottom: 20px;
+.profile-input:hover:not(:focus) {/*text that isnt active will go darker*/
+    border-color: #b0b8c1;
 }
 
-/* button */
-.profile-card button {
+.profile-name {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.profile-age {
+    text-align: center;
+}
+
+
+.profile-card button {/* save button */
     background: #249D8F;
     color: white;
     border: none;
     padding: 12px 20px;
     border-radius: 8px;
     font-weight: bold;
+    font-size: 14px;
     cursor: pointer;
+    transition: opacity 0.2s;
+    width: 100%;
 }
 
-.profile-card button:hover {
-    opacity: 0.95;
-}
+.profile-card button:hover { opacity: 0.9; }
 
-/* right side content */
-.profile-content {
+.profile-content { /*the cards on the right*/
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -111,15 +129,49 @@ body {
     line-height: 1.5;
 }
 
-/* list spacing */
 .activity-section ul {
     margin: 0;
-    padding-left: 20px;
+    padding-left: 50px;
 }
 
-/* mobile */
-@media (max-width: 900px) {
-    .profile-wrapper {
-        grid-template-columns: 1fr;
-    }
+/*interests answers*/
+.tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+
+.interest-tag {
+    background: #e8f4f3;
+    color: #0A447E;
+    border: 1px solid #b2d8d5;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.remove-tag {/*the x button designs*/
+    cursor: pointer;
+    margin-left: 6px;
+    color: #249D8F;
+    font-weight: bold;
+}
+
+.small-btn {/*interesr and plans buttons*/
+    background: none;
+    border: 1.5px solid #249D8F;
+    color: #249D8F;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.small-btn:hover {
+    background: #249D8F;
+    color: white;
+}
+
+.plan-input {
+    width: calc(100% - 30px);
+    margin-bottom: 6px;
 }
