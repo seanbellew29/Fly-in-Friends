@@ -118,8 +118,48 @@
     input.addEventListener("keypress", (e) => {
         if (e.key === "Enter") sendMessage();
     });
+
+
+    //function to load the messages
+    async function loadConvos() {
+    try {
+        const res = await fetch("/conversations");
+        if (!res.ok) 
+        throw new Error("Failed to load conversations");
+        const conversations = await res.json();
+
+        const list = document.getElementById("conversationList");
+        list.innerHTML = ""; //stops duplicates from side bar
+
+        conversations.forEach(convo => {
+            const div = document.createElement("div");
+            div.classList.add("conversation-item");
+
+           
+            if (convo.userId === otherUserId) {
+                div.classList.add("active");
+            } //using this to highlight the chat the user is in 
+
+            div.innerHTML = ` <span class="convo-username">${convo.username}</span>
+                <span class="convo-preview">${convo.lastMessage}</span>`; //this will give a preview of the last message 
+
+        
+            div.addEventListener("click", () => {
+                window.location.href = `/message/${convo.userId}`;
+            });
+
+            list.appendChild(div);
+        });
+    } catch (err) {
+        console.error("Error loading conversations:", err);
+    }
+}
+
+
     loadMessages();
+    loadConvos();
     setInterval(loadMessages, 3000);
+
 </script>
 
 <%- include("partials/footer"); %>
