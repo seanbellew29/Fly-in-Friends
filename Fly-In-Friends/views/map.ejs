@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="/styles/styles.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="icon" type="image/x-icon" href="../styles/Favicon.ico">
 </head>
 <body>
 
@@ -20,8 +21,10 @@
         <div id="listings-container">
             <h2>Available Hangouts</h2>
 
-            <% listings.forEach(listing => { %>
-                <div class="listing">
+            <!-- loop through all listings and display them -->
+            <% listings.forEach((listing, index) => { %>
+                <!-- store index so we can match listing to marker -->
+                <div class="listing" data-index="<%= index %>">
                     <h3>📍<%= listing.title %></h3>
                     <p><strong>Location:</strong> <%= listing.location %></p>
                     <p><strong>Activity:</strong> <%= listing.activity %></p>
@@ -31,11 +34,15 @@
     </div>
 
     <%- include("partials/footer"); %>
+
     <!-- makes the data from the server into browser javascript
-     so it can be used to generate map markers -->
+         so it can be used to generate map markers -->
     <script>
-    window.listings = <%- JSON.stringify(listings || []) %>;
-</script>
-<script src="/scripts/aScript.js"></script>
+        window.listings = <%- JSON.stringify(listings || []) %>;
+    </script>
+
+    <!-- loads the leaflet map logic -->
+    <script src="/scripts/aScript.js"></script>
+
 </body>
 </html>
