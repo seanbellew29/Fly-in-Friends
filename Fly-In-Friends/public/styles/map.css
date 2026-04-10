@@ -1,17 +1,20 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0; /* FIXED */
+    padding: 0;
     background: #f1f3f6; 
 }
 
-nav { margin-bottom: 20px; text-align: center; }
+nav {
+    margin-bottom: 20px;
+    text-align: center;
+}
 
-/* This creates the side-by-side look */
+/* Layout: map + sidebar */
 .split-view {
     display: flex;
     gap: 20px;
-    height: 600px; /* Forces the map to be visible */
+    height: 600px;
 }
 
 #map {
@@ -19,9 +22,10 @@ nav { margin-bottom: 20px; text-align: center; }
     height: 100%;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(1, 1, 58, 0.504);
+    box-shadow: 0 4px 12px rgba(1, 1, 58, 0.5);
 }
 
+/* Listings panel */
 #listings-container {
     flex: 1;
     overflow-y: auto;
@@ -29,6 +33,7 @@ nav { margin-bottom: 20px; text-align: center; }
     background: #f8f9fb;
     border: 1px solid #d9dee5;
     border-radius: 10px;
+    scroll-behavior: smooth; /* smoother scroll */
 }
 
 #listings-container h2 {
@@ -38,6 +43,7 @@ nav { margin-bottom: 20px; text-align: center; }
     color: #0A447E;
 }
 
+/* Individual listing cards */
 .listing {
     background: white;
     border: 1px solid #dfe3e8;
@@ -45,6 +51,9 @@ nav { margin-bottom: 20px; text-align: center; }
     padding: 18px;
     margin-bottom: 18px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    cursor: pointer; /* makes it feel clickable */
+    transition: all 0.2s ease;
 }
 
 .listing h3 {
@@ -60,7 +69,15 @@ nav { margin-bottom: 20px; text-align: center; }
     color: #333;
 }
 
+/* Hover effect */
 .listing:hover {
-    transform: translateY(-2px);
-    transition: 0.2s ease;
+    transform: translateY(-3px);
+    background-color: #f0f6ff;
+    border-color: #0A447E;
+}
+
+/* Optional selected state (ready for future use) */
+.listing.active {
+    border: 2px solid #0A447E;
+    background-color: #e6f0ff;
 }
