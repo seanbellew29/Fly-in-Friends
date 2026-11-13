@@ -1,0 +1,175 @@
+[33m12c1a4c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mvincent-auth[m[33m, [m[1;31morigin/vincent-auth[m[33m)[m Resolved conflicts and kept my server.js
+[33mfdcfb62[m Added Argon2 password hashing and AES-256-GCM email encryption
+[33m656f10c[m[33m ([m[1;31morigin/main[m[33m)[m Encyption & decryption implemented using vigenere
+[33m1e05d60[m Add files via upload
+[33meb90a18[m Fix HTML encoding issues in chat-page.ejs
+[33m1b840cf[m Update README.md
+[33m005ca8c[m Long overdue readme update
+[33m7d6d698[m Merge pull request #14 from seanbellew29/addListing
+[33m666b43b[m Add files via upload
+[33mefc2ade[m Add files via upload
+[33m504bbf8[m Add files via upload
+[33mbdbf633[m Add files via upload
+[33maade5fe[m Removal of unnecessary elemeny
+[33m8d1d0a8[m User can view previous chats
+[33m1972adf[m Delete Fly-In-Friends/chat-page.ejs
+[33m0732612[m Updated profile design
+[33mca19272[m User can edit and save profile info
+[33m748cd8c[m Profile design complete
+[33m3a025c9[m updated design for chat page
+[33m9e29baf[m updated server with updated chat improvements
+[33m6b64c91[m user can see their history of convos
+[33md2e5192[m user can see what user uploaded listing
+[33m7cc2190[m Delete Fly-In-Friends/messages.js
+[33m7f3a36a[m chat-page updated so users can chat
+[33m6cb1688[m Users can message other users
+[33m22899f1[m Had to add an "/" infront of the links
+[33m7498d55[m Update server.js
+[33mec5ae82[m User Id with listings and token fix
+[33m5d6da4b[m Add files via upload
+[33m3946731[m Update hover effect for listing cards
+[33maffc761[m Refactor listings.ejs for improved layout and styling
+[33m1cd7ca7[m Delete Fly-In-Friends/listings.ejs
+[33ma33ab40[m Merge pull request #13 from seanbellew29/addListing
+[33m196c778[m Add files via upload
+[33m1c8a383[m forgot to add this when i upgraded the lsiting page
+[33ma6c0f5c[m Unique User IDs
+[33m8dc0da7[m Merge pull request #11 from seanbellew29/create-token-error-fix
+[33mc5a1c9b[m Merge branch 'main' into create-token-error-fix
+[33mc088a42[m Merge pull request #12 from seanbellew29/addListing
+[33m88b2c29[m Add files via upload
+[33m84cb54a[m Add files via upload
+[33me41e7f9[m Add files via upload
+[33m1472a7a[m Todo: refresh
+[33mb70533f[m Delete server.js
+[33m837c1d7[m Create token error fix / Seán and Nickolas
+[33me2eea49[m css for map  and listing
+[33mb58c76a[m switched to Geoapify API
+[33m2e57ea6[m Add files via upload
+[33m485e988[m Add files via upload
+[33mc339d90[m  listing schema to include latitude and longitude
+[33m48d81fc[m got map working
+[33m0ac4c6e[m updated server.js for chat page
+[33m7fc7e3f[m updated messages.js
+[33m2038180[m favicon support
+[33m46be2ee[m favicon
+[33m2f7e3f4[m Update map.ejs
+[33md9ed151[m dependency update
+[33mefde01a[m Update Listings.js
+[33mb83f11a[m Update server.js
+[33m332a6c3[m Merge pull request #9 from seanbellew29/addListing
+[33m72dfc8a[m Merge branch 'main' into addListing
+[33m94414fa[m Delete Fly-In-Friends/listings.ejs
+[33m4366f3c[m Add files via upload
+[33m3718717[m Delete Fly-In-Friends/public/scripts/server.js
+[33m79cbaab[m Add files via upload
+[33m46971dd[m Add files via upload
+[33ma9c71b6[m Merge pull request #10 from seanbellew29/403-page-Nikolas-Misins
+[33m4b9a202[m Delete server.js
+[33m5962ae8[m Delete locationConversion.js
+[33m16d9d91[m Delete listings.ejs
+[33mfb978f3[m Delete Listing.js
+[33mb864ee3[m Add files via upload
+[33m7d1ef39[m Add files via upload
+[33mb9003bd[m Add files via upload
+[33m3637793[m added the ability to add listings
+[33m10189fa[m Merge pull request #8 from seanbellew29/Session/Tokens
+[33m82ba272[m update a redirect
+[33m1faea4b[m Token and session tracking functionality
+[33m6c1e1a0[m dependency update
+[33m611713b[m in process of adding the ability to add listings
+[33m70b4bd2[m Update package.json
+[33mb4a0b25[m Merge pull request #7 from seanbellew29/loginFunc
+[33me2a21df[m Merge branch 'main' into loginFunc
+[33m4607702[m Updated server.js
+[33ma444e50[m Delete server.js
+[33mc037754[m Profile page updated with option to add an image
+[33m933306f[m messages.js
+[33m4f65f8e[m Delete messages.js
+[33m49db967[m messages.js
+[33md9c78c7[m Add files via upload
+[33m8a69f3e[m newServer
+[33mf32719c[m Merge pull request #6 from seanbellew29/Server.js-updated-messages-route
+[33mf77f9fb[m Server.js with updated message route
+[33maff4fc7[m Add files via upload
+[33m8ef326d[m Add files via upload
+[33mdc62b14[m Add files via upload
+[33m18f5e3b[m Updated login and register
+[33m375bcef[m Delete Fly-In-Friends/login.ejs
+[33m8340287[m Delete Fly-In-Friends/register.ejs
+[33m5ac9579[m Add mongoose dependency to package.json
+[33m576641d[m Updated login page  and register page
+[33mdf55a72[m Updated server.js
+[33md402afd[m Delete server.js
+[33m14cf853[m Delete register.ejs
+[33m068a6f4[m Delete login.ejs
+[33mc320a15[m Register page added
+[33m61d2d9a[m Login credentials connected to the database
+[33m8d0539f[m Update server.js
+[33m5fbe008[m server function splitting
+[33m15ae3a8[m Update chat-page.ejs
+[33m1fa34e6[m fixes
+[33m6acb1a6[m Update chat-page.ejs
+[33mf734b56[m Update landing.ejs
+[33m16cf9c5[m Update map.ejs
+[33me1731bb[m Set up map with location markers
+[33m69eb6cd[m Fix script path and improve HTML structure
+[33m7846ae4[m Update profile-page.ejs with footer and styles
+[33m4e40c51[m Update map.ejs with new styles and footer
+[33m9406ec4[m Refactor login.ejs for improved structure and style
+[33m63f5cc7[m Include footer in listings.ejs
+[33m5e5421f[m Revise landing.ejs with new layout and content
+[33m2fd4ce0[m Refactor chat page layout and styles
+[33m79faefe[m all the css and images
+[33mcfac004[m Delete views/partials/navbar.ejs
+[33m4270694[m Delete views/partials/footer.ejs
+[33m84d8b99[m Delete views/profile-page.ejs
+[33m3bd1eaf[m Delete views/map.ejs
+[33mfbe3735[m Delete views/login.ejs
+[33m6f0c8c3[m Delete views/listings.ejs
+[33mdb1210d[m Delete views/landing.ejs
+[33m84043f8[m Delete views/chat-page.ejs
+[33m5f77e08[m Delete public/scripts/aScript.js
+[33m289de82[m Delete public/styles/styles.css
+[33m4e84b63[m Delete public/styles/profile-page.css
+[33m786af78[m Delete public/styles/map.css
+[33mcc03ea0[m Delete public/styles/login.png
+[33mafc9896[m Delete public/styles/login.css
+[33ma522a8a[m Delete public/styles/landing.css
+[33m445c989[m Delete public/styles/chat-page.css
+[33maa7571d[m Delete public/styles/Molly.png
+[33m767cd28[m Delete public/styles/Guinness.png
+[33mecd4f95[m Merge pull request #3 from seanbellew29/css,-footer,-landing-page,-login-page---Ryan
+[33maa29893[m Add files via upload
+[33mc0f1255[m Merge pull request #2 from seanbellew29/css,-footer,-landing-page,-login-page---Ryan
+[33mdba0349[m Refactor landing page styles with enhancements
+[33mb52fcfe[m Revamp landing page layout and add Molly image
+[33m941c87a[m Add files via upload
+[33meff3378[m ENV initialisation
+[33mfbd0867[m Update .gitignore
+[33m25028d7[m Static serving of public files
+[33m38f697e[m all my work so far
+[33m94e8c97[m Add files via upload
+[33m44b1aa6[m Backend
+[33mc68000f[m Delete Fly-In-Friends/views/map.html
+[33m63e79c2[m Delete Fly-In-Friends/views/listings.html
+[33m220b555[m Delete Fly-In-Friends/views/landing.html
+[33m5a5d380[m Delete Fly-In-Friends/views/chat-page.html
+[33me19be48[m Delete Fly-In-Friends/views/profile-page.html
+[33mac1dfbc[m Backend Connectivity
+[33m4b623a7[m ladning/about us page
+[33m5879773[m Delete Fly-In-Friends/public/index.html
+[33m6096bfd[m The Profile and Message page
+[33mbd1d7d9[m Add files via upload
+[33me530ec8[m login page
+[33m9567059[m Update .gitignore
+[33m5e193fa[m package json
+[33m36b4927[m Delete Fly-In-Friends/package-lock.json
+[33m7d91522[m Delete Fly-In-Friends/package.json
+[33m8435981[m Add files via upload
+[33mc5132b4[m Delete package.json
+[33m79bb196[m Delete package-lock.json
+[33m414f499[m modules
+[33m931f2c1[m Add files via upload
+[33m634a1d0[m Add files via upload
+[33m8c1bbf7[m Add fil
