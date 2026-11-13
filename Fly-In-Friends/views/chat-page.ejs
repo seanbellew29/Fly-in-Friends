@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Messaging</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/chat-page.css">
+    <link rel="icon" type="image/x-icon" href="../styles/Favicon.ico">
+</head>
+<body>
+
+    <%- include("partials/navbar"); %>
+
+    <div class="chat-wrapper">
+
+        <!-- Sidebar with users conversations -->
+        <div class="sidebar">
+            <h2>Messages</h2>
+            <div id="conversationList">
+            </div>
+        </div>
+
+        <!-- Chat section -->
+        <div class="chat-section">
+
+            <!-- Chat header showing recipient name -->
+            <div class="chat-header" id="chatHeader">
+                Chatting with <%= otherUsername %>
+            </div>
+
+            <!-- Messages container -->
+            <div class="messages" id="messages">
+            </div>
+
+            <!-- Input  sending messages -->
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Type a message...">
+                <button id="sendButton">Send</button>
+            </div>
+
+        </div>
+
+    </div>
+
+<script>
+  
+      const otherUserId = <%- JSON.stringify(otherUserId !== undefined ? otherUserId : null) %>;
+    const otherUsername = <%- JSON.stringify(otherUsername || '') %>; //error on this is not a problem think its a vs issue
+    
+  console.log("otherUserId:", otherUserId, "otherUsername:", otherUsername);
+
+    const messagesContainer = document.getElementById("messages");
+    const input = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+
+    // Handles missing user
+    if (!otherUserId || isNaN(otherUserId)) {
+        document.getElementById("chatHeader").textContent = "No user selected";
+        console.error("Invalid otherUserId:", otherUserId);
+    }
+
+    // Function for  fetching the messages
+    async function loadMessages() {
+        if (!otherUserId) return; // no user selected
+        try {
+            const res = await fetch(`/messages/${otherUserId}`);
+            if (!res.ok) throw new Error("Failed to load messages");
+            const messages = await res.json();
+            messagesContainer.innerHTML = "";
+            messages.forEach(msg => {
+                const div = document.createElement("div");
+                div.classList.add("message");
+                if (msg.sender === otherUserId) {
+                    div.classList.add("sent");
+                } else {
+                    div.classList.add("received");
+                }
+                div.textContent = msg.content;
+                messagesContainer.appendChild(div);
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        } catch (err) {
+            console.error("Error loading messages:", err);
+        }
+    }
+
+    // Function to send a message
+    async function sendMessage() {
+        if (!otherUserId) {
+            alert("No user selected");
+            return;
+        }
+
+        const content = input.value.trim();
+        if (!content) return;
+
+        try {
+            const res = await fetch("/send-message", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ receiverId: otherUserId, content })
+            });
+
+            const text = await res.text();
+            console.log("Response:", text);
+
+            if (res.ok) {
+                input.value = "";
+                loadMessages();
+            } else {
+                alert("Error sending message: " + text);
+            }
+        } catch (err) {
+            console.error("Error sending message:", err);
+        }
+    }
+    sendButton.addEventListener("click", sendMessage);
+    input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendMessage();
+    });
+
+
+    //function to load the messages
+    async function loadConvos() {
+    try {
+        const res = await fetch("/conversations");
+        if (!res.ok) 
+        throw new Error("Failed to load conversations");
+        const conversations = await res.json();
+
+        const list = document.getElementById("conversationList");
+        list.innerHTML = ""; //stops duplicates from side bar
+
+        conversations.forEach(convo => {
+            const div = document.createElement("div");
+            div.classList.add("conversation-item");
+
+           
+            if (convo.userId === otherUserId) {
+                div.classList.add("active");
+            } //using this to highlight the chat the user is in 
+
+            div.innerHTML = ` <span class="convo-username">${convo.username}</span>
+                <span class="convo-preview">${convo.lastMessage}</span>`; //this will give a preview of the last message 
+
+        
+            div.addEventListener("click", () => {
+                window.location.href = `/message/${convo.userId}`;
+            });
+
+            list.appendChild(div);
+        });
+    } catch (err) {
+        console.error("Error loading conversations:", err);
+    }
+}
+
+
+    loadMessages();
+    loadConvos();
+    setInterval(loadMessages, 3000);
+
+</script>
+
+<%- include("partials/footer"); %>
+
+</body>
+</html>

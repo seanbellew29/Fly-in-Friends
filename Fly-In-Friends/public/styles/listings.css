@@ -1,0 +1,103 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f1f3f6;
+}
+
+
+.page-container {
+    padding: 10px 30px 20px;
+}
+
+/* TITLE */
+.main-title {
+    font-size: 36px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* NAV LINKS */
+.nav-links {
+    margin-bottom: 20px;
+}
+
+.nav-links a {
+    color: #0A447E;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
+
+/* ADD LISTING CARD */
+.add-listing-card {
+    background: white;
+    padding: 18px;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+/* FORM */
+.add-listing-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.add-listing-form input {
+    flex: 1;
+    padding: 9px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.add-listing-form button {
+    background: #0A447E;
+    color: white;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.add-listing-form button:hover {
+    background: #08315c;
+}
+
+/* SECTION TITLE */
+.section-title {
+    margin-bottom: 10px;
+}
+
+/* LISTING CARDS */
+.listing {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-left: 5px solid #0A447E;
+    transition: 0.2s ease;
+}
+
+.listing h3 {
+    margin-top: 0;
+    color: #0A447E;
+}
+
+.listing p {
+    margin: 6px 0;
+    font-size: 14px;
+}
+
+/* hover affect */
+
+ .listing:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
