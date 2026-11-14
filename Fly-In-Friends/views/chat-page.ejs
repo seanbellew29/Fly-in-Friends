@@ -43,6 +43,9 @@
     </div>
 
 <script>
+
+
+
   
       const otherUserId = <%- JSON.stringify(otherUserId !== undefined ? otherUserId : null) %>;
     const otherUsername = <%- JSON.stringify(otherUsername || '') %>; //error on this is not a problem think its a vs issue
@@ -59,6 +62,65 @@
         console.error("Invalid otherUserId:", otherUserId);
     }
 
+    //Encryption and decryption. Using the vigenere cipher to sendning messages through the chat
+    function encryptVigenere(message, key){  //encryption
+        key = key.toUpperCase();
+
+        if(!key)
+        throw new Error("Invalid key");
+        
+        let result = "";
+        let indexKey = 0;
+
+        for(let char of message.toUpperCase()){
+            if(char >= "A" && char <= Z){
+                const messageCode = char.charCode(0) - 65; //subtracting 65 as the cipher uses numbers from 1 -  25
+                const keyCode = key.charCodeAt(keyIndex % key.length) -65; //converst the letter to a number
+                result += String.fromCharCode(
+                    ((messageCode + keyCode) % 26) + 65 // makes sure the number doesnt go past 25 so it wraps back to beginning of the alphabet 
+
+                  );
+
+                  keyIndex++;
+
+            
+            }else{
+                result += char;
+            }
+
+        }
+        return result;
+    }
+
+    function decryptVigenere(cipherText, key){  //decryption for the vigenere cipher
+        key = key.toUpperCase();
+
+        if(!key)
+        throw new Error("Invalid decryption");
+
+        let result = "";
+        let indexKey = 0;
+
+         for(let char of message.toUpperCase()){
+            if(char >= "A" && char <= Z){
+                const cipherText = char.charCode(0) - 65; 
+                const keyCode = key.charCodeAt(keyIndex % key.length) -65; 
+                result += String.fromCharCode(
+                    ((cipherText + keyCode) % 26) + 65 
+
+                    
+                  );
+                  keyIndex++;
+
+    }else{
+        result =+ char;
+
+    }
+}
+    return result;
+    }
+
+
     // Function for  fetching the messages
     async function loadMessages() {
         if (!otherUserId) return; // no user selected
@@ -71,9 +133,9 @@
                 const div = document.createElement("div");
                 div.classList.add("message");
                 if (msg.sender === otherUserId) {
-                    div.classList.add("sent");
-                } else {
                     div.classList.add("received");
+                } else {
+                    div.classList.add("sent");
                 }
                 div.textContent = msg.content;
                 messagesContainer.appendChild(div);
@@ -83,6 +145,9 @@
             console.error("Error loading messages:", err);
         }
     }
+
+
+
 
     // Function to send a message
     async function sendMessage() {
@@ -118,6 +183,9 @@
     input.addEventListener("keypress", (e) => {
         if (e.key === "Enter") sendMessage();
     });
+
+
+
 
 
     //function to load the messages
